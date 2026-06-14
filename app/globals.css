@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand palette */
+  --color-navy: #001e3c;
+  --color-navy-light: #0a3258;
+  --color-paper: #f7f6f1;
+  --color-paper-dim: #efede5;
+  --color-line: #ddd9cd;
+  --color-green: #4a7a18;
+  --color-green-bright: #6ea028;
+  --color-green-pale: #eef3e2;
+  --color-amber: #f5a623;
+  --color-amber-dark: #d6890b;
+  --color-ink: #1c2b1f;
+  --color-muted: #6b7264;
+
+  --font-display: var(--font-space-grotesk, "Space Grotesk"), "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-jetbrains-mono, "JetBrains Mono"), "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+}
+
+@theme inline {
+  --color-navy: var(--color-navy);
+  --color-navy-light: var(--color-navy-light);
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+  --color-line: var(--color-line);
+  --color-green: var(--color-green);
+  --color-green-bright: var(--color-green-bright);
+  --color-green-pale: var(--color-green-pale);
+  --color-amber: var(--color-amber);
+  --color-amber-dark: var(--color-amber-dark);
+  --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* Dashed boundary motif — used across the site as a signature divider */
+.plot-divider {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--color-line) 0,
+    var(--color-line) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+.plot-divider-green {
+  height: 2px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--color-green-bright) 0,
+    var(--color-green-bright) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+}
+
+.plot-border {
+  border: 1.5px dashed var(--color-line);
+}
+
+.plot-border-hover:hover {
+  border-color: var(--color-green-bright);
+}
+
+/* Coordinate / data label style */
+.coord-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: reveal-up 0.6s ease-out both;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus visibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-green-bright);
+  outline-offset: 2px;
+}
