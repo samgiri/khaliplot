@@ -138,11 +138,15 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail size={16} className="shrink-0 text-green-bright" />
-                hello@khaliplot.in
+                <a href="mailto:hello@khaliplot.in" className="hover:text-green-bright">
+                  hello@khaliplot.in
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={16} className="shrink-0 text-green-bright" />
-                +91 90000 00000
+                <a href="tel:+919625763256" className="hover:text-green-bright">
+                  +91 96257 63256
+                </a>
               </li>
             </ul>
           </div>
