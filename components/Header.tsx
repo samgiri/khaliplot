@@ -27,7 +27,7 @@ export default function Header() {
             priority
           />
           <span className="font-display text-xl font-bold leading-none text-navy sm:text-2xl">
-            khaliplot<span className="text-green-bright">.in</span>
+            khaliplot<span className="text-amber">.in</span>
           </span>
         </Link>
 

@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, ShieldCheck, IndianRupee, Users, TreePine, Building2, Tractor, Factory, Home as HomeIcon } from "lucide-react";
+import { ArrowRight, MapPin, ShieldCheck, IndianRupee, Users, TreePine, Building2, Tractor, Factory, Home as HomeIcon, Mountain, Landmark, TrendingUp, Lock, Layers } from "lucide-react";
 import SearchCard from "@/components/SearchCard";
 import PlotMapIllustration from "@/components/PlotMapIllustration";
 import PlotCard from "@/components/PlotCard";
+import GrowthChart from "@/components/GrowthChart";
 import { listings } from "@/lib/data";
 
 const plotCategories = [
@@ -21,9 +22,42 @@ const stats = [
 ];
 
 const cityRoadmap = [
-  { city: "Lonavla", status: "Live now", note: "Home turf — zero organised digital competition" },
-  { city: "Pune", status: "Next up", note: "65 km away, highest plot volume, IT buyer base" },
-  { city: "Nashik", status: "Phase 3", note: "Kumbh Mela 2026 demand, agricultural land hub" },
+  {
+    city: "Lonavla",
+    status: "Live now",
+    note: "Home turf — zero organised digital competition",
+    icon: Mountain,
+  },
+  {
+    city: "Pune",
+    status: "Next up",
+    note: "65 km away, highest plot volume, IT buyer base",
+    icon: Building2,
+  },
+  {
+    city: "Nashik",
+    status: "Phase 3",
+    note: "Kumbh Mela 2026 demand, agricultural land hub",
+    icon: Landmark,
+  },
+];
+
+const plotAdvantages = [
+  {
+    icon: TrendingUp,
+    title: "Land appreciates, structures depreciate",
+    text: "A building ages and needs upkeep; the land beneath it tends to gain value over time as the area develops — plots let you invest in that upside directly.",
+  },
+  {
+    icon: Lock,
+    title: "Low maintenance, low risk",
+    text: "No tenants, no repairs, no society fees. A plot just sits and (typically) appreciates — ideal for long-term wealth building without ongoing hassle.",
+  },
+  {
+    icon: Layers,
+    title: "Flexible for the future",
+    text: "Build a home, lease it for farming, or hold for resale — vacant land keeps your options open in a way a finished flat never can.",
+  },
 ];
 
 export default function Home() {
@@ -176,6 +210,61 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why plots matter */}
+      <section className="bg-paper-dim py-16">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
+            <div>
+              <p className="coord-label text-green">Why plots matter</p>
+              <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
+                Land has been India&apos;s steadiest store of value
+              </h2>
+              <p className="mt-3 text-ink/80">
+                Across India, well-located plots have historically appreciated faster than
+                finished construction — especially near expanding highways, IT corridors and
+                pilgrimage routes. As infrastructure reaches a region, the land under it tends
+                to re-rate long before new buildings do.
+              </p>
+              <div className="mt-6 space-y-5">
+                {plotAdvantages.map(({ icon: Icon, title, text }) => (
+                  <div key={title} className="flex gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-green-pale text-green">
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-semibold text-navy">{title}</h3>
+                      <p className="mt-1 text-sm text-ink/70">{text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-line bg-white p-5 sm:p-6">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <p className="coord-label text-green">Illustrative trend</p>
+                  <h3 className="mt-1 font-display text-lg font-semibold text-navy">
+                    Land price index, 2019–2025
+                  </h3>
+                </div>
+                <span className="rounded-full bg-green-pale px-2.5 py-1 text-xs font-semibold text-green">
+                  ~3.6x in 6 yrs
+                </span>
+              </div>
+              <div className="mt-4">
+                <GrowthChart />
+              </div>
+              <p className="mt-3 text-xs text-muted">
+                Illustrative composite index for representative Maharashtra plot markets near
+                expanding infrastructure corridors. Actual returns vary by location, NA status
+                and market conditions — always do independent due diligence.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* City roadmap */}
       <section className="bg-navy py-16 text-paper">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -188,15 +277,23 @@ export default function Home() {
             active listings and steady weekly inquiries.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {cityRoadmap.map((item, i) => (
-              <div key={item.city} className="relative rounded-lg border border-paper/15 p-6">
-                <span className="coord-label text-green-bright">
-                  {item.status === "Live now" ? "● Live now" : `Phase ${i + 1}`}
-                </span>
-                <h3 className="mt-2 font-display text-xl font-bold">{item.city}</h3>
-                <p className="mt-2 text-sm text-paper/70">{item.note}</p>
-              </div>
-            ))}
+            {cityRoadmap.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.city} className="relative rounded-lg border border-paper/15 p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-md bg-paper/10 text-green-bright">
+                      <Icon size={22} />
+                    </div>
+                    <span className="coord-label text-green-bright">
+                      {item.status === "Live now" ? "● Live now" : `Phase ${i + 1}`}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 font-display text-xl font-bold">{item.city}</h3>
+                  <p className="mt-2 text-sm text-paper/70">{item.note}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
