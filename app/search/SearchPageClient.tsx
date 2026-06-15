@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, X } from "lucide-react";
 import PlotCard from "@/components/PlotCard";
-import { listings, cities, plotTypes } from "@/lib/data";
+import { cities, plotTypes, Listing } from "@/lib/data";
 
 const sortOptions = [
   { value: "newest", label: "Newest first" },
@@ -13,8 +13,9 @@ const sortOptions = [
   { value: "area-large", label: "Area: Largest first" },
 ];
 
-export default function SearchPageClient() {
+export default function SearchPageClient({ initialListings }: { initialListings: Listing[] }) {
   const searchParams = useSearchParams();
+  const listings = initialListings;
 
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [type, setType] = useState(searchParams.get("type") || "");

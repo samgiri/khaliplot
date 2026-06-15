@@ -73,3 +73,61 @@ Open http://localhost:3000
 - Add image upload + real photos (currently placeholders)
 - Add authentication for the seller dashboard
 - Replace the location placeholder on listing pages with an embedded map
+
+## Setting up the database (Supabase) and admin panel
+
+This project supports a real database for listings via Supabase, plus a
+password-protected `/admin` page for adding/editing/deleting listings without
+touching code. Until Supabase is configured, the site falls back to the
+bundled mock data in `lib/data.ts` automatically.
+
+### 1. Create a Supabase project
+
+1. Go to https://supabase.com and sign up (GitHub login recommended)
+2. Click **New Project** — name it `khaliplot`, choose a region close to
+   India (e.g. Singapore), set a database password, and create it
+3. Once ready, go to **Project Settings -> API** and note down:
+   - **Project URL**
+   - **anon public** key
+   - **service_role** key (keep this secret!)
+
+### 2. Create the listings table
+
+1. In Supabase, go to **SQL Editor -> New query**
+2. Paste the contents of `supabase/schema.sql` and run it
+3. (Optional) To pre-populate with the 22 demo listings, paste the contents
+   of `supabase/seed.sql` and run it too
+
+### 3. Set environment variables
+
+Copy `.env.local.example` to `.env.local` and fill in:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+ADMIN_PASSWORD=choose-a-strong-password
+```
+
+For local development, `.env.local` is read automatically by `next dev`.
+
+### 4. Add the same env vars to Vercel
+
+1. Go to your Vercel project -> **Settings -> Environment Variables**
+2. Add each of the four variables above (same names, same values)
+3. Redeploy (or push a commit) so the live site picks them up
+
+### 5. Using the admin panel
+
+Visit `/admin` on your site (e.g. `https://khaliplot.in/admin`). You'll be
+asked for the `ADMIN_PASSWORD` you set. From there you can:
+
+- Add new listings (they start as `status = pending`)
+- Edit any field of an existing listing
+- Change status between `pending`, `live`, `sold`, `rejected` — only `live`
+  listings appear on the public site
+- Delete listings
+
+No code changes or redeploys are needed for any of this — changes appear on
+the public site within about a minute (or instantly on next page load for
+the homepage/listing pages).

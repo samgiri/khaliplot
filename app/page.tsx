@@ -4,7 +4,7 @@ import SearchCard from "@/components/SearchCard";
 import PlotMapIllustration from "@/components/PlotMapIllustration";
 import PlotCard from "@/components/PlotCard";
 import GrowthChart from "@/components/GrowthChart";
-import { listings } from "@/lib/data";
+import { getLiveListings } from "@/lib/listings-service";
 
 const plotCategories = [
   { type: "Residential", icon: HomeIcon, description: "NA plots ready for homes" },
@@ -60,7 +60,8 @@ const plotAdvantages = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const listings = await getLiveListings();
   return (
     <>
       {/* Hero */}

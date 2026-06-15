@@ -12,16 +12,15 @@ import {
   ArrowLeft,
   ShieldCheck,
 } from "lucide-react";
-import { getListingById, listings, formatPrice, formatArea } from "@/lib/data";
+import { formatPrice, formatArea } from "@/lib/data";
+import { getLiveListingById, getLiveListings } from "@/lib/listings-service";
 import PlotCard from "@/components/PlotCard";
 
-export function generateStaticParams() {
-  return listings.map((l) => ({ id: l.id }));
-}
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const listing = getListingById(id);
+  const listing = await getLiveListingById(id);
   if (!listing) return {};
   return {
     title: `${listing.title} | KhaliPlot.in`,
@@ -35,10 +34,11 @@ export default async function ListingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const listing = getListingById(id);
+  const listing = await getLiveListingById(id);
   if (!listing) notFound();
 
-  const similar = listings
+  const allListings = await getLiveListings();
+  const similar = allListings
     .filter((l) => l.id !== listing.id && l.city === listing.city)
     .slice(0, 3);
 
