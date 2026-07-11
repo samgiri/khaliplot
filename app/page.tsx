@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, ShieldCheck, IndianRupee, Users, TreePine, Building2, Tractor, Factory, Home as HomeIcon, Mountain, Landmark, TrendingUp, Lock, Layers } from "lucide-react";
+import { ArrowRight, MapPin, ShieldCheck, IndianRupee, Users, TreePine, Building2, Tractor, Factory, Home as HomeIcon, Mountain, Landmark, TrendingUp, Lock, Layers, ListPlus, Search, MessageCircle } from "lucide-react";
 import SearchCard from "@/components/SearchCard";
 import PlotMapIllustration from "@/components/PlotMapIllustration";
 import PlotCard from "@/components/PlotCard";
@@ -40,6 +40,12 @@ const cityRoadmap = [
     note: "Kumbh Mela 2026 demand, agricultural land hub",
     icon: Landmark,
   },
+];
+
+const howItWorksSteps = [
+  { icon: ListPlus, title: "List free", text: "Post your plot in 5 minutes — no listing fees." },
+  { icon: Search, title: "Buyer finds you", text: "Interested buyers browse and shortlist your plot." },
+  { icon: MessageCircle, title: "Talk direct, no broker fees", text: "Connect and close the deal — no middleman markup." },
 ];
 
 const plotAdvantages = [
@@ -100,6 +106,29 @@ export default async function Home() {
           </div>
         </div>
         <div className="plot-divider-green" />
+      </section>
+
+      {/* How it works */}
+      <section className="border-b border-line bg-paper-dim py-10">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {howItWorksSteps.map(({ icon: Icon, title, text }, i) => (
+              <div key={title} className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green text-paper">
+                  <Icon size={20} />
+                </div>
+                <div>
+                  <p className="coord-label text-green">Step {i + 1}</p>
+                  <h3 className="font-display font-semibold text-navy">{title}</h3>
+                  <p className="mt-1 text-sm text-ink/70">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-sm font-medium text-navy/70">
+            🔒 Your number stays private.
+          </p>
+        </div>
       </section>
 
       {/* Plot categories */}
@@ -296,6 +325,41 @@ export default async function Home() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* Pricing teaser */}
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+        <div className="mb-8 text-center">
+          <p className="coord-label text-green">Pricing</p>
+          <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
+            Browse free. Pay only to talk to a seller.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <div className="rounded-lg border border-line bg-white p-6 text-center">
+            <h3 className="font-display font-semibold text-navy">Free</h3>
+            <p className="mt-2 font-display text-2xl font-bold text-navy">₹0</p>
+            <p className="mt-1 text-sm text-muted">1 contact reveal / month</p>
+          </div>
+          <div className="rounded-lg border-2 border-amber bg-white p-6 text-center shadow-md">
+            <h3 className="font-display font-semibold text-navy">Plus</h3>
+            <p className="mt-2 font-display text-2xl font-bold text-navy">₹999<span className="text-sm font-normal text-muted">/mo</span></p>
+            <p className="mt-1 text-sm text-muted">Unlimited reveals + verified badge</p>
+          </div>
+          <div className="rounded-lg border border-line bg-white p-6 text-center">
+            <h3 className="font-display font-semibold text-navy">Reveal Pack</h3>
+            <p className="mt-2 font-display text-2xl font-bold text-navy">₹499</p>
+            <p className="mt-1 text-sm text-muted">10 reveals, valid 90 days</p>
+          </div>
+        </div>
+        <div className="mt-8 text-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-1.5 font-semibold text-green hover:text-navy"
+          >
+            See full pricing <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 

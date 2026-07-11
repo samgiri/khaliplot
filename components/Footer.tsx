@@ -61,7 +61,7 @@ export default function Footer() {
   return (
     <footer className="bg-navy text-paper">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <Link href="/" className="flex items-center gap-2.5">
               <Image
@@ -140,6 +140,42 @@ export default function Footer() {
               <li>
                 <Link href="/#about" className="text-paper/80 hover:text-green-bright">
                   Why KhaliPlot
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="coord-label text-paper/50">Company</h3>
+            <ul className="mt-4 space-y-3 text-sm">
+              <li>
+                <Link href="/about" className="text-paper/80 hover:text-green-bright">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="text-paper/80 hover:text-green-bright">
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-paper/80 hover:text-green-bright">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-paper/80 hover:text-green-bright">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-paper/80 hover:text-green-bright">
+                  Terms
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-paper/80 hover:text-green-bright">
+                  Privacy
                 </Link>
               </li>
             </ul>
