@@ -1,6 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import { Listing, PlotType, listings as seedListings } from "@/lib/data";
 
+// Columns safe to expose publicly. seller_phone is deliberately excluded —
+// it's only readable via the service role key, and will only reach a buyer
+// through the contact-reveal flow (quota-checked, server-side).
+const PUBLIC_LISTING_COLUMNS =
+  "id, title, plot_type, city, locality, state, area_sqft, price_lakh, " +
+  "price_per_sqft, facing, road_width_ft, dimensions, zone, features, " +
+  "description, verified, status, seller_name, seller_type, lat, lng, " +
+  "images, created_at, updated_at";
+
 // Database row shape (snake_case, as stored in Supabase)
 interface ListingRow {
   id: string;
@@ -22,7 +31,6 @@ interface ListingRow {
   status: string;
   seller_name: string;
   seller_type: string;
-  seller_phone: string;
   lat: number | null;
   lng: number | null;
   images: number;
@@ -56,7 +64,8 @@ function rowToListing(row: ListingRow): Listing {
     verified: row.verified,
     sellerName: row.seller_name,
     sellerType: row.seller_type as Listing["sellerType"],
-    sellerPhone: row.seller_phone,
+    // Withheld from the public payload — see PUBLIC_LISTING_COLUMNS above.
+    sellerPhone: "",
     coordinates: { lat: Number(row.lat ?? 0), lng: Number(row.lng ?? 0) },
     images: row.images,
   };
@@ -75,7 +84,7 @@ export async function getLiveListings(): Promise<Listing[]> {
   try {
     const { data, error } = await supabase
       .from("listings")
-      .select("*")
+      .select(PUBLIC_LISTING_COLUMNS)
       .eq("status", "live")
       .order("created_at", { ascending: false });
 
@@ -83,7 +92,7 @@ export async function getLiveListings(): Promise<Listing[]> {
       return seedListings;
     }
 
-    return data.map(rowToListing);
+    return (data as unknown as ListingRow[]).map(rowToListing);
   } catch {
     return seedListings;
   }
@@ -101,7 +110,7 @@ export async function getLiveListingById(id: string): Promise<Listing | undefine
   try {
     const { data, error } = await supabase
       .from("listings")
-      .select("*")
+      .select(PUBLIC_LISTING_COLUMNS)
       .eq("id", id)
       .eq("status", "live")
       .maybeSingle();
@@ -110,7 +119,7 @@ export async function getLiveListingById(id: string): Promise<Listing | undefine
       return seedListings.find((l) => l.id === id);
     }
 
-    return rowToListing(data);
+    return rowToListing(data as unknown as ListingRow);
   } catch {
     return seedListings.find((l) => l.id === id);
   }

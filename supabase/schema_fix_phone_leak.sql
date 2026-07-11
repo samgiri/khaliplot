@@ -1,0 +1,12 @@
+-- Fix: listings.seller_phone was readable by anyone with the public anon key
+-- (select("*") on a row with status = 'live' returned the raw phone number,
+-- and it was rendered directly on the public listing detail page).
+--
+-- Run this in Supabase SQL Editor AFTER schema.sql.
+--
+-- Column-level privilege revoke: even though RLS allows reading rows where
+-- status = 'live', this stops the anon/authenticated roles from reading the
+-- seller_phone column on those rows at all. Only the service role (used
+-- server-side by the admin panel, and later the contact-reveal flow) can
+-- still read it.
+revoke select (seller_phone) on listings from anon, authenticated;
