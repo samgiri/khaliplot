@@ -173,7 +173,7 @@ export default async function ListingDetailPage({
             <p className="text-sm text-muted">Posted {listing.postedDaysAgo} day{listing.postedDaysAgo !== 1 ? "s" : ""} ago</p>
             <p className="mt-3 flex items-center gap-2 font-display text-lg font-bold text-navy">
               <Phone size={16} className="text-green" />
-              {listing.sellerPhone}
+              {listing.sellerPhone || "Contact hidden — reveal coming soon"}
             </p>
 
             <div className="mt-5 flex flex-col gap-2.5">
