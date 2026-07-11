@@ -1,7 +1,25 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, ShieldCheck, IndianRupee, Users, TreePine, Building2, Tractor, Factory, Home as HomeIcon, Mountain, Landmark, TrendingUp, Lock, Layers, ListPlus, Search, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  ShieldCheck,
+  PhoneOff,
+  Map as MapIcon,
+  MessageCircle,
+  Mail,
+  TreePine,
+  Building2,
+  Tractor,
+  Factory,
+  Home as HomeIcon,
+  Mountain,
+  Landmark,
+  TrendingUp,
+  Lock,
+  Layers,
+  Check,
+  Zap,
+} from "lucide-react";
 import SearchCard from "@/components/SearchCard";
-import PlotMapIllustration from "@/components/PlotMapIllustration";
 import PlotCard from "@/components/PlotCard";
 import GrowthChart from "@/components/GrowthChart";
 import { getLiveListings } from "@/lib/listings-service";
@@ -14,38 +32,17 @@ const plotCategories = [
   { type: "Industrial", icon: Factory, description: "Warehousing & factory land" },
 ];
 
-const stats = [
-  { label: "Active listings", value: "120+" },
-  { label: "Cities live", value: "1" },
-  { label: "Weekly inquiries", value: "20+" },
-  { label: "Brokerage charged", value: "₹0" },
+const trustStrip = [
+  { icon: ShieldCheck, title: "Verified listings", text: "Checked for clear title and accurate details before going live." },
+  { icon: PhoneOff, title: "No spam calls", text: "Your number stays private until you choose to reveal it." },
+  { icon: MapIcon, title: "Map view", text: "See exactly where a plot sits before you plan a visit." },
+  { icon: MessageCircle, title: "WhatsApp connect", text: "Reach owners directly — no broker markup, no middlemen." },
 ];
 
 const cityRoadmap = [
-  {
-    city: "Lonavla",
-    status: "Live now",
-    note: "Home turf — zero organised digital competition",
-    icon: Mountain,
-  },
-  {
-    city: "Pune",
-    status: "Next up",
-    note: "65 km away, highest plot volume, IT buyer base",
-    icon: Building2,
-  },
-  {
-    city: "Nashik",
-    status: "Phase 3",
-    note: "Kumbh Mela 2026 demand, agricultural land hub",
-    icon: Landmark,
-  },
-];
-
-const howItWorksSteps = [
-  { icon: ListPlus, title: "List free", text: "Post your plot in 5 minutes — no listing fees." },
-  { icon: Search, title: "Buyer finds you", text: "Interested buyers browse and shortlist your plot." },
-  { icon: MessageCircle, title: "Talk direct, no broker fees", text: "Connect and close the deal — no middleman markup." },
+  { city: "Lonavla", status: "Live now", note: "Home turf — zero organised digital competition", icon: Mountain },
+  { city: "Pune", status: "Next up", note: "65 km away, highest plot volume, IT buyer base", icon: Building2 },
+  { city: "Nashik", status: "Phase 3", note: "Kumbh Mela 2026 demand, agricultural land hub", icon: Landmark },
 ];
 
 const plotAdvantages = [
@@ -66,72 +63,64 @@ const plotAdvantages = [
   },
 ];
 
+const pricingTeaser = [
+  { name: "Free", price: "₹0", note: "1 contact reveal / month" },
+  { name: "Plus", price: "from ₹999", note: "Unlimited reveals + verified badge", highlight: true },
+  { name: "Reveal Pack", price: "₹499", note: "10 reveals, valid 90 days" },
+  { name: "Booster", price: "₹499", note: "Pin your listing to the top for 7 days" },
+];
+
 export default async function Home() {
   const listings = await getLiveListings();
+  const recentListings = listings.slice(0, 6);
+
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-paper">
+      <section className="relative overflow-hidden bg-navy text-paper">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-2 lg:gap-16">
           <div className="reveal">
-            <span className="coord-label inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-green">
-              <MapPin size={13} />
-              Now live in Lonavla, Maharashtra
+            <span className="coord-label inline-flex items-center gap-2 rounded-full border border-paper/20 bg-paper/10 px-3 py-1.5 text-green-bright">
+              🇮🇳 India&apos;s dedicated plot marketplace
             </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] text-navy sm:text-5xl lg:text-6xl">
-              Empty land,
-              <br />
-              <span className="text-green">full possibilities.</span>
+            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] text-paper sm:text-5xl lg:text-6xl">
+              Find your perfect <span className="text-amber">Khali Plot</span> across India
             </h1>
-            <p className="mt-5 max-w-lg text-lg text-ink/80">
-              India&apos;s plot marketplace — built only for vacant land. Browse verified plots,
-              talk directly to owners, and skip the apartment listings that clutter every other
-              property site.
+            <p className="mt-5 max-w-lg text-lg text-paper/70">
+              Browse verified residential, agricultural &amp; commercial plots directly from
+              owners. Zero brokerage. No spam calls. Pan India coverage.
             </p>
-            <div className="mt-8">
-              <SearchCard />
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/search"
+                className="inline-flex items-center gap-2 rounded-md bg-amber px-6 py-3 font-semibold text-navy transition-colors hover:bg-amber-dark"
+              >
+                Search plots <ArrowRight size={18} />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-md border-2 border-paper/30 px-6 py-3 font-semibold text-paper transition-colors hover:bg-paper/10"
+              >
+                <MessageCircle size={18} /> Contact us
+              </Link>
             </div>
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <p className="font-display text-2xl font-bold text-navy">{stat.value}</p>
-                  <p className="text-xs text-muted">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+            <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-paper/60">
+              <span>RERA verified listings</span>
+              <span aria-hidden="true">·</span>
+              <span>Direct owner contact</span>
+              <span aria-hidden="true">·</span>
+              <span>Zero brokerage</span>
+            </p>
           </div>
 
-          <div className="reveal hidden lg:block" style={{ animationDelay: "0.15s" }}>
-            <PlotMapIllustration className="w-full" />
+          <div className="reveal" style={{ animationDelay: "0.15s" }}>
+            <SearchCard />
           </div>
         </div>
         <div className="plot-divider-green" />
       </section>
 
-      {/* How it works */}
-      <section className="border-b border-line bg-paper-dim py-10">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {howItWorksSteps.map(({ icon: Icon, title, text }, i) => (
-              <div key={title} className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green text-paper">
-                  <Icon size={20} />
-                </div>
-                <div>
-                  <p className="coord-label text-green">Step {i + 1}</p>
-                  <h3 className="font-display font-semibold text-navy">{title}</h3>
-                  <p className="mt-1 text-sm text-ink/70">{text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-sm font-medium text-navy/70">
-            🔒 Your number stays private.
-          </p>
-        </div>
-      </section>
-
-      {/* Plot categories */}
+      {/* Browse by plot type */}
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="mb-8 flex items-end justify-between">
           <div>
@@ -166,14 +155,14 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured listings */}
+      {/* Recently added plots */}
       <section className="bg-paper-dim py-14">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mb-8 flex items-end justify-between">
             <div>
               <p className="coord-label text-green">Fresh on the market</p>
               <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
-                Featured plots in Lonavla &amp; nearby
+                Recently added plots
               </h2>
             </div>
             <Link
@@ -183,11 +172,20 @@ export default async function Home() {
               View all <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {listings.slice(0, 4).map((listing) => (
-              <PlotCard key={listing.id} listing={listing} />
-            ))}
-          </div>
+          {recentListings.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {recentListings.map((listing) => (
+                <PlotCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          ) : (
+            <div className="plot-border rounded-lg bg-white p-12 text-center">
+              <p className="font-display text-lg font-semibold text-navy">
+                No plots listed yet
+              </p>
+              <p className="mt-2 text-sm text-muted">Check back soon — new plots go live every week.</p>
+            </div>
+          )}
           <div className="mt-8 text-center sm:hidden">
             <Link
               href="/search"
@@ -199,7 +197,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Why KhaliPlot / About */}
+      {/* Why KhaliPlot trust strip */}
       <section id="about" className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="mb-10 max-w-2xl">
           <p className="coord-label text-green">Why KhaliPlot</p>
@@ -212,40 +210,23 @@ export default async function Home() {
             sell vacant land — faster, with less noise.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-          <div className="rounded-lg border border-line bg-white p-6">
-            <ShieldCheck className="text-green" size={28} />
-            <h3 className="mt-3 font-display font-semibold text-navy">Verified listings</h3>
-            <p className="mt-2 text-sm text-ink/70">
-              Plots are checked for clear title, NA conversion status and accurate dimensions
-              before they go live.
-            </p>
-          </div>
-          <div className="rounded-lg border border-line bg-white p-6">
-            <Users className="text-green" size={28} />
-            <h3 className="mt-3 font-display font-semibold text-navy">Direct from owners</h3>
-            <p className="mt-2 text-sm text-ink/70">
-              Talk to the seller directly. No middleman markup, no recycled broker listings
-              across five different sites.
-            </p>
-          </div>
-          <div className="rounded-lg border border-line bg-white p-6">
-            <IndianRupee className="text-green" size={28} />
-            <h3 className="mt-3 font-display font-semibold text-navy">Zero brokerage to browse</h3>
-            <p className="mt-2 text-sm text-ink/70">
-              Search, compare and shortlist plots for free. Sellers list their first plots at no
-              cost too.
-            </p>
-          </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {trustStrip.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="rounded-lg border border-line bg-white p-6">
+              <Icon className="text-green" size={28} />
+              <h3 className="mt-3 font-display font-semibold text-navy">{title}</h3>
+              <p className="mt-2 text-sm text-ink/70">{text}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Why plots matter */}
+      {/* Why invest in plots & land */}
       <section className="bg-paper-dim py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="coord-label text-green">Why plots matter</p>
+              <p className="coord-label text-green">Why invest in plots &amp; land?</p>
               <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
                 Land has been India&apos;s steadiest store of value
               </h2>
@@ -336,22 +317,24 @@ export default async function Home() {
             Browse free. Pay only to talk to a seller.
           </h2>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-          <div className="rounded-lg border border-line bg-white p-6 text-center">
-            <h3 className="font-display font-semibold text-navy">Free</h3>
-            <p className="mt-2 font-display text-2xl font-bold text-navy">₹0</p>
-            <p className="mt-1 text-sm text-muted">1 contact reveal / month</p>
-          </div>
-          <div className="rounded-lg border-2 border-amber bg-white p-6 text-center shadow-md">
-            <h3 className="font-display font-semibold text-navy">Plus</h3>
-            <p className="mt-2 font-display text-2xl font-bold text-navy">₹999<span className="text-sm font-normal text-muted">/mo</span></p>
-            <p className="mt-1 text-sm text-muted">Unlimited reveals + verified badge</p>
-          </div>
-          <div className="rounded-lg border border-line bg-white p-6 text-center">
-            <h3 className="font-display font-semibold text-navy">Reveal Pack</h3>
-            <p className="mt-2 font-display text-2xl font-bold text-navy">₹499</p>
-            <p className="mt-1 text-sm text-muted">10 reveals, valid 90 days</p>
-          </div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {pricingTeaser.map((plan) => (
+            <div
+              key={plan.name}
+              className={`flex flex-col rounded-lg border bg-white p-6 text-center ${
+                plan.highlight ? "border-2 border-amber shadow-md" : "border-line"
+              }`}
+            >
+              {plan.highlight ? (
+                <Zap className="mx-auto text-amber" size={20} />
+              ) : (
+                <Check className="mx-auto text-green" size={20} />
+              )}
+              <h3 className="mt-2 font-display font-semibold text-navy">{plan.name}</h3>
+              <p className="mt-2 font-display text-2xl font-bold text-navy">{plan.price}</p>
+              <p className="mt-1 text-sm text-muted">{plan.note}</p>
+            </div>
+          ))}
         </div>
         <div className="mt-8 text-center">
           <Link
@@ -364,7 +347,7 @@ export default async function Home() {
       </section>
 
       {/* Sell CTA */}
-      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
         <div className="overflow-hidden rounded-xl border-2 border-navy bg-green-pale px-6 py-12 text-center shadow-[6px_6px_0_0_var(--color-navy)] sm:px-12">
           <p className="coord-label text-green">For landowners</p>
           <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
@@ -380,6 +363,36 @@ export default async function Home() {
           >
             Post your plot <ArrowRight size={18} />
           </Link>
+        </div>
+      </section>
+
+      {/* Contact CTA strip */}
+      <section className="bg-paper-dim py-14">
+        <div className="mx-auto max-w-4xl px-5 text-center sm:px-8">
+          <p className="coord-label text-green">Still have questions?</p>
+          <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
+            Talk to us directly — no bots, no call centers
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-ink/70">
+            Reach out over WhatsApp for a quick reply, or drop us an email — our team responds
+            personally.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="https://wa.me/919625763256"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md bg-whatsapp px-6 py-3 font-semibold text-white transition-colors hover:bg-whatsapp-hover"
+            >
+              <MessageCircle size={18} /> WhatsApp us
+            </a>
+            <a
+              href="mailto:hello@khaliplot.in"
+              className="inline-flex items-center gap-2 rounded-md border-2 border-navy px-6 py-3 font-semibold text-navy transition-colors hover:bg-navy hover:text-paper"
+            >
+              <Mail size={18} /> Email us
+            </a>
+          </div>
         </div>
       </section>
     </>
