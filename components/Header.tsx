@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, Plus } from "lucide-react";
 
@@ -11,8 +12,15 @@ const navLinks = [
   { href: "/#about", label: "About" },
 ];
 
-export default function Header() {
+export default function Header({ userEmail }: { userEmail: string | null }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  async function handleSignOut() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setOpen(false);
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm">
@@ -43,7 +51,22 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
+          {userEmail ? (
+            <button
+              onClick={handleSignOut}
+              className="font-medium text-navy/80 transition-colors hover:text-green"
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="font-medium text-navy/80 transition-colors hover:text-green"
+            >
+              Sign in
+            </Link>
+          )}
           <Link
             href="/seller"
             className="flex items-center gap-1.5 rounded-md bg-amber px-4 py-2 font-semibold text-navy transition-colors hover:bg-amber-dark"
@@ -76,6 +99,19 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {userEmail ? (
+              <button onClick={handleSignOut} className="text-left font-medium text-navy/80">
+                Sign out
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="font-medium text-navy/80"
+                onClick={() => setOpen(false)}
+              >
+                Sign in
+              </Link>
+            )}
             <Link
               href="/seller"
               className="flex w-fit items-center gap-1.5 rounded-md bg-amber px-4 py-2 font-semibold text-navy"
