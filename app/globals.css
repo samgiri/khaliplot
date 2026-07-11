@@ -1,27 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand palette */
+  /* Brand palette — design-locked, see Part 1.5 brief. Match exactly. */
   --color-navy: #001e3c;
-  --color-navy-light: #0a3258;
-  --color-paper: #f7f6f1;
-  --color-paper-dim: #efede5;
-  --color-line: #ddd9cd;
+  --color-navy-dark: #00142a;
+  --color-navy-light: #0f2d50;
+  --color-paper: #faf8f3;
+  --color-paper-dim: #edecea;
+  --color-line: #d8d6d0;
   --color-green: #4a7a18;
   --color-green-bright: #6ea028;
   --color-green-pale: #eef3e2;
   --color-amber: #f5a623;
-  --color-amber-dark: #d6890b;
-  --color-ink: #1c2b1f;
-  --color-muted: #6b7264;
+  --color-amber-dark: #e89a18;
+  --color-amber-light: #fde9b8;
+  --color-ink: #2e2d2a;
+  --color-muted: #5c5a55;
+  --color-label: #9a9890;
+  --color-red: #d04030;
+  --color-blue: #2563a8;
+  --color-whatsapp: #25d366;
+  --color-whatsapp-hover: #20ba5b;
+  --color-email: #ea4335;
+  --color-email-hover: #d33127;
 
-  --font-display: var(--font-space-grotesk, "Space Grotesk"), "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --font-body: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-syne, "Syne"), "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: var(--font-dm-sans, "DM Sans"), -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: var(--font-jetbrains-mono, "JetBrains Mono"), "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
 }
 
 @theme inline {
   --color-navy: var(--color-navy);
+  --color-navy-dark: var(--color-navy-dark);
   --color-navy-light: var(--color-navy-light);
   --color-paper: var(--color-paper);
   --color-paper-dim: var(--color-paper-dim);
@@ -31,8 +41,16 @@
   --color-green-pale: var(--color-green-pale);
   --color-amber: var(--color-amber);
   --color-amber-dark: var(--color-amber-dark);
+  --color-amber-light: var(--color-amber-light);
   --color-ink: var(--color-ink);
   --color-muted: var(--color-muted);
+  --color-label: var(--color-label);
+  --color-red: var(--color-red);
+  --color-blue: var(--color-blue);
+  --color-whatsapp: var(--color-whatsapp);
+  --color-whatsapp-hover: var(--color-whatsapp-hover);
+  --color-email: var(--color-email);
+  --color-email-hover: var(--color-email-hover);
 
   --font-display: var(--font-display);
   --font-body: var(--font-body);
@@ -47,6 +65,8 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 /* Dashed boundary motif — used across the site as a signature divider */
@@ -86,7 +106,7 @@ body {
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-muted);
+  color: var(--color-label);
 }
 
 @media (prefers-reduced-motion: no-preference) {
