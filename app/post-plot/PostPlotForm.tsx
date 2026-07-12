@@ -15,6 +15,8 @@ import {
   Loader2,
   ChevronDown,
   CheckCircle2,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import { cities as ALL_CITIES, plotTypes, type Listing } from "@/lib/data";
 import { INDIAN_STATES, PRIME_CITIES, OTHER_CITY } from "@/lib/profile-data";
@@ -45,6 +47,7 @@ interface PhotoSlot {
   previewUrl: string;
   status: "uploading" | "done" | "error";
   url?: string;
+  file?: File; // kept for retry
 }
 
 function citySelectValue(city: string): string {
@@ -54,9 +57,11 @@ function citySelectValue(city: string): string {
 export default function PostPlotForm({
   editingId,
   initial,
+  localitySuggestions = [],
 }: {
   editingId?: string;
   initial?: Listing | null;
+  localitySuggestions?: { city: string; locality: string }[];
 }) {
   const router = useRouter();
 
@@ -69,6 +74,15 @@ export default function PostPlotForm({
   const [locality, setLocality] = useState(initial?.locality ?? "");
   const [mapsLink, setMapsLink] = useState(initial?.mapsLink ?? "");
   const city = citySelect === OTHER_CITY ? cityOther.trim() : citySelect;
+  const localityOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          localitySuggestions.filter((s) => s.city === city).map((s) => s.locality)
+        )
+      ),
+    [localitySuggestions, city]
+  );
 
   // Plot type
   const [plotType, setPlotType] = useState(initial?.plotType ?? "");
@@ -76,14 +90,19 @@ export default function PostPlotForm({
   // Size & price
   const [areaUnit, setAreaUnit] = useState<AreaUnit>((initial?.areaUnit as AreaUnit) ?? "sqft");
   const [areaValue, setAreaValue] = useState(initial?.areaValue ? String(initial.areaValue) : "");
-  const [priceLakh, setPriceLakh] = useState(initial ? String(initial.priceLakh) : "");
+  const initialIsCr = Boolean(initial && initial.priceLakh >= 100);
+  const [priceUnit, setPriceUnit] = useState<"lakh" | "cr">(initialIsCr ? "cr" : "lakh");
+  const [priceInput, setPriceInput] = useState(
+    initial ? String(initialIsCr ? initial.priceLakh / 100 : initial.priceLakh) : ""
+  );
   const [perUnitTouched, setPerUnitTouched] = useState(false);
   const [pricePerUnitInput, setPricePerUnitInput] = useState(
     initial?.pricePerUnit ? String(Math.round(initial.pricePerUnit)) : ""
   );
 
   const areaValueNum = Number(areaValue) || 0;
-  const priceLakhNum = Number(priceLakh) || 0;
+  const priceInputNum = Number(priceInput) || 0;
+  const priceLakhNum = priceUnit === "cr" ? priceInputNum * 100 : priceInputNum;
   const totalRupees = priceLakhNum * 100000;
   const areaSqft = areaValueNum > 0 ? toSqft(areaValueNum, areaUnit) : 0;
   const pricePerSqft = areaSqft > 0 && totalRupees > 0 ? totalRupees / areaSqft : 0;
@@ -137,44 +156,57 @@ export default function PostPlotForm({
 
   const citiesForDropdown = useMemo(() => Array.from(new Set([...PRIME_CITIES, ...ALL_CITIES])), []);
 
+  async function uploadPhoto(key: string, file: File) {
+    setPhotos((prev) => prev.map((p) => (p.key === key ? { ...p, status: "uploading" } : p)));
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("not signed in");
+
+      const compressed = await compressImage(file);
+      const path = `${user.id}/${key}.jpg`;
+      const { error: uploadError } = await supabase.storage
+        .from("listing-photos")
+        .upload(path, compressed, { contentType: "image/jpeg", upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrl } = supabase.storage.from("listing-photos").getPublicUrl(path);
+      setPhotos((prev) =>
+        prev.map((p) => (p.key === key ? { ...p, status: "done", url: publicUrl.publicUrl } : p))
+      );
+    } catch {
+      setPhotos((prev) => prev.map((p) => (p.key === key ? { ...p, status: "error" } : p)));
+    }
+  }
+
   async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []).slice(0, MAX_PHOTOS - photos.length);
     e.target.value = "";
     if (files.length === 0) return;
 
-    const supabase = getSupabaseBrowserClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     for (const file of files) {
       const key = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const previewUrl = URL.createObjectURL(file);
-      setPhotos((prev) => [...prev, { key, previewUrl, status: "uploading" }]);
-
-      try {
-        const compressed = await compressImage(file);
-        const path = `${user.id}/${key}.jpg`;
-        const { error: uploadError } = await supabase.storage
-          .from("listing-photos")
-          .upload(path, compressed, { contentType: "image/jpeg" });
-
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrl } = supabase.storage.from("listing-photos").getPublicUrl(path);
-        setPhotos((prev) =>
-          prev.map((p) => (p.key === key ? { ...p, status: "done", url: publicUrl.publicUrl } : p))
-        );
-      } catch {
-        setPhotos((prev) => prev.map((p) => (p.key === key ? { ...p, status: "error" } : p)));
-      }
+      setPhotos((prev) => [...prev, { key, previewUrl, status: "uploading", file }]);
+      uploadPhoto(key, file);
     }
+  }
+
+  function retryPhoto(slot: PhotoSlot) {
+    if (!slot.file) return;
+    uploadPhoto(slot.key, slot.file);
   }
 
   function removePhoto(key: string) {
     setPhotos((prev) => prev.filter((p) => p.key !== key));
   }
+
+  const failedPhotoCount = photos.filter((p) => p.status === "error").length;
+  const uploadingPhotoCount = photos.filter((p) => p.status === "uploading").length;
 
   async function handleGenerateDescription() {
     if (!city || !state || !areaValueNum || !priceLakhNum) {
@@ -215,6 +247,20 @@ export default function PostPlotForm({
 
     if (priceTooLow) {
       setErrorMessage("That price looks too low — please check the amount (minimum ₹10,000).");
+      setStatus("error");
+      return;
+    }
+
+    if (uploadingPhotoCount > 0) {
+      setErrorMessage("Please wait for your photos to finish uploading before publishing.");
+      setStatus("error");
+      return;
+    }
+
+    if (failedPhotoCount > 0) {
+      setErrorMessage(
+        `${failedPhotoCount} photo${failedPhotoCount > 1 ? "s" : ""} failed to upload — retry or remove ${failedPhotoCount > 1 ? "them" : "it"} before publishing.`
+      );
       setStatus("error");
       return;
     }
@@ -269,7 +315,7 @@ export default function PostPlotForm({
     }
   }
 
-  const anyUploading = photos.some((p) => p.status === "uploading");
+  const anyUploading = uploadingPhotoCount > 0;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -316,14 +362,22 @@ export default function PostPlotForm({
             )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-navy">Locality / Village</label>
+            <label className="text-sm font-semibold text-navy">Locality / Area</label>
             <input
               required
               value={locality}
               onChange={(e) => setLocality(e.target.value)}
-              placeholder="e.g. Tungarli"
+              placeholder="e.g. Dwarka More, Hinjawadi, Tungarli"
+              list="locality-suggestions"
               className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
             />
+            {localityOptions.length > 0 && (
+              <datalist id="locality-suggestions">
+                {localityOptions.map((loc) => (
+                  <option key={loc} value={loc} />
+                ))}
+              </datalist>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-navy">
@@ -398,17 +452,33 @@ export default function PostPlotForm({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-navy">Price (₹ Lakh)</label>
-            <input
-              required
-              type="number"
-              min="0"
-              step="any"
-              value={priceLakh}
-              onChange={(e) => setPriceLakh(e.target.value)}
-              placeholder="e.g. 67.5"
-              className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
-            />
+            <label className="text-sm font-semibold text-navy">Price</label>
+            <div className="flex">
+              <input
+                required
+                type="number"
+                min="0"
+                step="any"
+                value={priceInput}
+                onChange={(e) => setPriceInput(e.target.value)}
+                placeholder={priceUnit === "cr" ? "e.g. 1.5" : "e.g. 67.5"}
+                className="w-full rounded-l-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
+              />
+              <div className="flex shrink-0 overflow-hidden rounded-r-md border border-l-0 border-line">
+                {(["lakh", "cr"] as const).map((unit) => (
+                  <button
+                    key={unit}
+                    type="button"
+                    onClick={() => setPriceUnit(unit)}
+                    className={`px-3 py-2.5 text-sm font-semibold transition-colors ${
+                      priceUnit === unit ? "bg-green text-paper" : "bg-white text-navy hover:bg-paper-dim"
+                    }`}
+                  >
+                    {unit === "lakh" ? "₹ Lakh" : "₹ Cr"}
+                  </button>
+                ))}
+              </div>
+            </div>
             {totalRupees > 0 && (
               <p className="text-xs text-muted">= {formatIndianRupees(totalRupees)}</p>
             )}
@@ -696,6 +766,19 @@ export default function PostPlotForm({
         <p className="text-sm font-semibold text-navy">
           Photos <span className="font-normal text-muted">(up to {MAX_PHOTOS}, first photo is the cover)</span>
         </p>
+        {uploadingPhotoCount > 0 && (
+          <p className="flex items-center gap-1.5 text-sm text-muted">
+            <Loader2 size={14} className="animate-spin" />
+            Uploading {uploadingPhotoCount} photo{uploadingPhotoCount > 1 ? "s" : ""}…
+          </p>
+        )}
+        {failedPhotoCount > 0 && (
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-amber-dark">
+            <AlertTriangle size={14} />
+            {failedPhotoCount} photo{failedPhotoCount > 1 ? "s" : ""} failed to upload — retry or remove{" "}
+            {failedPhotoCount > 1 ? "them" : "it"} below.
+          </p>
+        )}
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
           {photos.map((p) => (
             <div key={p.key} className="group relative aspect-square overflow-hidden rounded-lg border border-line bg-green-pale">
@@ -707,8 +790,17 @@ export default function PostPlotForm({
                 </div>
               )}
               {p.status === "error" && (
-                <div className="absolute inset-0 flex items-center justify-center bg-amber/80 text-xs font-semibold text-navy">
-                  Failed
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-amber/90 text-xs font-semibold text-navy">
+                  Failed to upload
+                  {p.file && (
+                    <button
+                      type="button"
+                      onClick={() => retryPhoto(p)}
+                      className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-paper"
+                    >
+                      <RefreshCw size={12} /> Retry
+                    </button>
+                  )}
                 </div>
               )}
               <button
@@ -741,7 +833,7 @@ export default function PostPlotForm({
 
       <button
         type="submit"
-        disabled={status === "loading" || anyUploading || priceTooLow}
+        disabled={status === "loading" || anyUploading || failedPhotoCount > 0 || priceTooLow}
         className="flex w-full items-center justify-center gap-2 rounded-md bg-amber px-6 py-3.5 font-semibold text-navy transition-colors hover:bg-amber-dark disabled:opacity-60 sm:w-auto"
       >
         {status === "loading" ? (

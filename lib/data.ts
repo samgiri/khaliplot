@@ -631,6 +631,26 @@ export function formatPrice(priceLakh: number): string {
   return `₹${priceLakh.toFixed(priceLakh % 1 === 0 ? 0 : 1)} Lakh`;
 }
 
+/**
+ * Joins location parts (locality, city, state, ...), dropping empties and
+ * de-duplicating case-insensitively. Needed because "Delhi NCR" is valid
+ * as both a city and a state value — without this, a listing there renders
+ * as "Dwarka More, Delhi NCR, Delhi NCR".
+ */
+export function formatLocation(...parts: (string | null | undefined)[]): string {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const part of parts) {
+    const trimmed = part?.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(trimmed);
+  }
+  return result.join(", ");
+}
+
 export function formatArea(sqft: number): string {
   if (sqft >= 43560) {
     const acres = sqft / 43560;
