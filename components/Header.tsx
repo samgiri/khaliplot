@@ -3,8 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Menu, X, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Menu, X, Plus, ChevronDown, LayoutDashboard, UserCircle, LogOut } from "lucide-react";
+import { firstName } from "@/lib/profile-data";
 
 const navLinks = [
   { href: "/search", label: "Browse plots" },
@@ -13,15 +14,37 @@ const navLinks = [
   { href: "/#about", label: "About" },
 ];
 
-export default function Header({ userEmail }: { userEmail: string | null }) {
+interface HeaderUser {
+  email: string;
+  name: string | null;
+}
+
+export default function Header({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   async function handleSignOut() {
     await fetch("/api/auth/logout", { method: "POST" });
     setOpen(false);
+    setMenuOpen(false);
+    router.push("/");
     router.refresh();
   }
+
+  const displayName = user ? firstName(user.name) || user.email.split("@")[0] : "";
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm">
@@ -53,13 +76,45 @@ export default function Header({ userEmail }: { userEmail: string | null }) {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
-          {userEmail ? (
-            <button
-              onClick={handleSignOut}
-              className="font-medium text-navy/80 transition-colors hover:text-green"
-            >
-              Sign out
-            </button>
+          {user ? (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="flex items-center gap-2 font-medium text-navy/80 transition-colors hover:text-green"
+                aria-expanded={menuOpen}
+                aria-haspopup="true"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-pale text-sm font-semibold text-green">
+                  {initial}
+                </span>
+                {displayName}
+                <ChevronDown size={16} />
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-line bg-white py-2 shadow-md">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-navy hover:bg-paper-dim"
+                  >
+                    <LayoutDashboard size={16} /> Dashboard
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-navy hover:bg-paper-dim"
+                  >
+                    <UserCircle size={16} /> My profile
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-navy hover:bg-paper-dim"
+                  >
+                    <LogOut size={16} /> Log out
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link
               href="/login"
@@ -100,10 +155,30 @@ export default function Header({ userEmail }: { userEmail: string | null }) {
                 {link.label}
               </Link>
             ))}
-            {userEmail ? (
-              <button onClick={handleSignOut} className="text-left font-medium text-navy/80">
-                Sign out
-              </button>
+            {user ? (
+              <>
+                <div className="plot-divider my-1" />
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 font-medium text-navy/80"
+                  onClick={() => setOpen(false)}
+                >
+                  <LayoutDashboard size={18} /> Dashboard
+                </Link>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 font-medium text-navy/80"
+                  onClick={() => setOpen(false)}
+                >
+                  <UserCircle size={18} /> My profile
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 text-left font-medium text-navy/80"
+                >
+                  <LogOut size={18} /> Log out
+                </button>
+              </>
             ) : (
               <Link
                 href="/login"
