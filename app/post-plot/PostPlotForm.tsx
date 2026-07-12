@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MapPin,
   Home as HomeIcon,
@@ -18,8 +18,9 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
-import { cities as ALL_CITIES, plotTypes, type Listing } from "@/lib/data";
-import { INDIAN_STATES, PRIME_CITIES, OTHER_CITY } from "@/lib/profile-data";
+import { plotTypes, type Listing } from "@/lib/data";
+import { LOCATION_STATES, getRegionsForState, findStateForRegion } from "@/lib/locations";
+import { useGooglePlaces } from "@/lib/use-google-places";
 import { AREA_UNITS, toSqft, unitLabel, formatIndianRupees, type AreaUnit } from "@/lib/listing-units";
 import { getLandRecordLabel } from "@/lib/land-records";
 import {
@@ -50,10 +51,6 @@ interface PhotoSlot {
   file?: File; // kept for retry
 }
 
-function citySelectValue(city: string): string {
-  return (PRIME_CITIES as readonly string[]).includes(city) ? city : city ? OTHER_CITY : "";
-}
-
 export default function PostPlotForm({
   editingId,
   initial,
@@ -65,15 +62,36 @@ export default function PostPlotForm({
 }) {
   const router = useRouter();
 
-  // Location
-  const [state, setState] = useState(initial?.state ?? "");
-  const [citySelect, setCitySelect] = useState(initial ? citySelectValue(initial.city) : "");
-  const [cityOther, setCityOther] = useState(
-    initial && citySelectValue(initial.city) === OTHER_CITY ? initial.city : ""
+  // Location — State -> Region (metro area, stored in the city column) ->
+  // Locality. Edit-prefill derives the state from the stored region when
+  // possible, since legacy rows may carry "Delhi NCR" in the state column.
+  const [state, setState] = useState(
+    initial ? (findStateForRegion(initial.city) ?? initial.state) : ""
   );
+  const [region, setRegion] = useState(initial?.city ?? "");
   const [locality, setLocality] = useState(initial?.locality ?? "");
   const [mapsLink, setMapsLink] = useState(initial?.mapsLink ?? "");
-  const city = citySelect === OTHER_CITY ? cityOther.trim() : citySelect;
+  const [lat, setLat] = useState<number | null>(initial?.coordinates.lat || null);
+  const [lng, setLng] = useState<number | null>(initial?.coordinates.lng || null);
+  const city = region;
+
+  // Legacy rows (posted via the old free-text "Other" city) may hold values
+  // outside the hierarchy — keep them selectable so editing doesn't wipe data.
+  const stateOptions = useMemo(
+    () => (state && !LOCATION_STATES.includes(state) ? [...LOCATION_STATES, state] : LOCATION_STATES),
+    [state]
+  );
+  const regionOptions = useMemo(() => {
+    const regions = getRegionsForState(state);
+    return region && !regions.includes(region) ? [...regions, region] : regions;
+  }, [state, region]);
+
+  function selectState(next: string) {
+    setState(next);
+    const regions = getRegionsForState(next);
+    setRegion(regions.length === 1 ? regions[0] : "");
+  }
+
   const localityOptions = useMemo(
     () =>
       Array.from(
@@ -83,6 +101,39 @@ export default function PostPlotForm({
       ),
     [localitySuggestions, city]
   );
+
+  // Google Places autocomplete on the locality input. When the script is
+  // ready we attach the widget (restricted to India) and capture the place
+  // name + coordinates on selection; when the key isn't configured the
+  // input silently stays a plain text field with the datalist suggestions.
+  const placesReady = useGooglePlaces();
+  const localityInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const AutocompleteCtor = window.google?.maps?.places?.Autocomplete;
+    if (!placesReady || !localityInputRef.current || !AutocompleteCtor) return;
+
+    const autocomplete = new AutocompleteCtor(localityInputRef.current, {
+      componentRestrictions: { country: "in" },
+      fields: ["name", "formatted_address", "geometry"],
+      types: ["geocode"],
+    });
+
+    const listener = autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (place.name) setLocality(place.name);
+      const location = place.geometry?.location;
+      if (location) {
+        const placeLat = location.lat();
+        const placeLng = location.lng();
+        setLat(placeLat);
+        setLng(placeLng);
+        setMapsLink((prev) => prev || `https://www.google.com/maps/search/?api=1&query=${placeLat},${placeLng}`);
+      }
+    });
+
+    return () => listener.remove();
+  }, [placesReady]);
 
   // Plot type
   const [plotType, setPlotType] = useState(initial?.plotType ?? "");
@@ -154,7 +205,6 @@ export default function PostPlotForm({
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const citiesForDropdown = useMemo(() => Array.from(new Set([...PRIME_CITIES, ...ALL_CITIES])), []);
 
   async function uploadPhoto(key: string, file: File) {
     setPhotos((prev) => prev.map((p) => (p.key === key ? { ...p, status: "uploading" } : p)));
@@ -274,6 +324,8 @@ export default function PostPlotForm({
       state,
       city,
       locality,
+      lat,
+      lng,
       mapsLink,
       areaUnit,
       areaValue: areaValueNum,
@@ -328,55 +380,51 @@ export default function PostPlotForm({
             <select
               required
               value={state}
-              onChange={(e) => setState(e.target.value)}
+              onChange={(e) => selectState(e.target.value)}
               className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green-bright"
             >
               <option value="">Select state</option>
-              {INDIAN_STATES.map((s) => (
+              {stateOptions.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-navy">City / Area</label>
+            <label className="text-sm font-semibold text-navy">Region / Metro area</label>
             <select
               required
-              value={citySelect}
-              onChange={(e) => setCitySelect(e.target.value)}
-              className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green-bright"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              disabled={!state}
+              className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green-bright disabled:bg-paper-dim disabled:text-muted"
             >
-              <option value="">Select city</option>
-              {citiesForDropdown.map((c) => (
-                <option key={c} value={c}>{c}</option>
+              <option value="">{state ? "Select region" : "Select a state first"}</option>
+              {regionOptions.map((r) => (
+                <option key={r} value={r}>{r}</option>
               ))}
-              <option value={OTHER_CITY}>Other</option>
             </select>
-            {citySelect === OTHER_CITY && (
-              <input
-                required
-                value={cityOther}
-                onChange={(e) => setCityOther(e.target.value)}
-                placeholder="Enter your city / area"
-                className="mt-1 w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
-              />
-            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-navy">Locality / Area</label>
             <input
+              ref={localityInputRef}
               required
               value={locality}
               onChange={(e) => setLocality(e.target.value)}
-              placeholder="e.g. Dwarka More, Hinjawadi, Tungarli"
-              list="locality-suggestions"
+              placeholder="e.g. Dwarka, Hinjawadi, Kharghar"
+              list={placesReady ? undefined : "locality-suggestions"}
               className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
             />
-            {localityOptions.length > 0 && (
-              <datalist id="locality-suggestions">
-                {localityOptions.map((loc) => (
-                  <option key={loc} value={loc} />
-                ))}
-              </datalist>
+            {placesReady ? (
+              <p className="text-xs text-muted">Start typing and pick a suggestion to pin the exact location.</p>
+            ) : (
+              localityOptions.length > 0 && (
+                <datalist id="locality-suggestions">
+                  {localityOptions.map((loc) => (
+                    <option key={loc} value={loc} />
+                  ))}
+                </datalist>
+              )
             )}
           </div>
           <div className="flex flex-col gap-1.5">

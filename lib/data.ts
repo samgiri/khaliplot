@@ -611,6 +611,7 @@ export const cities = [
   "Nashik",
   "Dholera",
   "Bengaluru",
+  "Hyderabad",
   "Goa",
 ] as const;
 

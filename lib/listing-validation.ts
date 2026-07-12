@@ -26,6 +26,8 @@ export interface ParsedListingFields {
   road_width_ft: number;
   description: string;
   maps_link: string | null;
+  lat: number | null;
+  lng: number | null;
   ownership_type: string | null;
   transaction_type: string | null;
   na_status: string | null;
@@ -101,6 +103,17 @@ export function parseListingFields(
 
   const mapsLink =
     typeof body.mapsLink === "string" ? body.mapsLink.trim().slice(0, 500) || null : null;
+
+  // Coordinates from the Places autocomplete (optional; columns exist since
+  // the original schema). Only stored when both are valid lat/lng values.
+  const latRaw = Number(body.lat);
+  const lngRaw = Number(body.lng);
+  const hasCoords =
+    Number.isFinite(latRaw) && Number.isFinite(lngRaw) &&
+    latRaw >= -90 && latRaw <= 90 && lngRaw >= -180 && lngRaw <= 180 &&
+    !(latRaw === 0 && lngRaw === 0);
+  const lat = hasCoords ? latRaw : null;
+  const lng = hasCoords ? lngRaw : null;
   const facing = typeof body.facing === "string" && body.facing ? body.facing : "East";
   const roadWidthFt = Number(body.roadWidthFt) || 0;
   const cornerPlot = typeof body.cornerPlot === "boolean" ? body.cornerPlot : null;
@@ -131,6 +144,8 @@ export function parseListingFields(
       road_width_ft: roadWidthFt,
       description,
       maps_link: mapsLink,
+      lat,
+      lng,
       ownership_type: ownershipType,
       transaction_type: transactionType,
       na_status: naStatus,
