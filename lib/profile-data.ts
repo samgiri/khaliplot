@@ -101,6 +101,13 @@ export function isProfileComplete(
   );
 }
 
+/** Maps a profile role to the listings table's seller_type vocabulary (Owner/Agent/Builder). */
+export function roleToSellerType(role: Role | null | undefined): "Owner" | "Agent" | "Builder" {
+  if (role === "broker") return "Agent";
+  if (role === "builder") return "Builder";
+  return "Owner";
+}
+
 export function firstName(name: string | null | undefined): string {
   if (!name) return "";
   return name.trim().split(/\s+/)[0] ?? "";

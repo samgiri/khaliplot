@@ -128,13 +128,13 @@ export default function Footer() {
             <h3 className="coord-label text-paper/50">For sellers</h3>
             <ul className="mt-4 space-y-3 text-sm">
               <li>
-                <Link href="/seller" className="text-paper/80 hover:text-green-bright">
+                <Link href="/post-plot" className="text-paper/80 hover:text-green-bright">
                   Post a plot — free
                 </Link>
               </li>
               <li>
-                <Link href="/seller" className="text-paper/80 hover:text-green-bright">
-                  Seller dashboard
+                <Link href="/my-listings" className="text-paper/80 hover:text-green-bright">
+                  My listings
                 </Link>
               </li>
               <li>

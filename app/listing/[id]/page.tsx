@@ -11,9 +11,12 @@ import {
   ImageOff,
   ArrowLeft,
   ShieldCheck,
+  FileCheck2,
 } from "lucide-react";
 import { formatPrice, formatArea } from "@/lib/data";
 import { getLiveListingById, getLiveListings } from "@/lib/listings-service";
+import { DOCUMENT_BADGE_LABELS, type DocumentKey } from "@/lib/listing-form-data";
+import { getLandRecordLabel } from "@/lib/land-records";
 import PlotCard from "@/components/PlotCard";
 
 export const revalidate = 60;
@@ -51,6 +54,21 @@ export default async function ListingDetailPage({
     { label: "Price/sqft", value: `₹${listing.pricePerSqft.toLocaleString("en-IN")}`, icon: BadgeCheck },
   ];
 
+  const documents = listing.documents ?? {};
+  const documentBadges = (Object.keys(DOCUMENT_BADGE_LABELS) as DocumentKey[])
+    .filter((key) => documents[key])
+    .map((key) =>
+      key === "land_record" ? `${getLandRecordLabel(listing.state)} extract` : DOCUMENT_BADGE_LABELS[key]
+    );
+  const ownershipBadges = [
+    listing.ownershipType,
+    listing.transactionType,
+    listing.naStatus === "Yes" ? "NA converted" : null,
+  ].filter((b): b is string => Boolean(b));
+  const complianceBadges = [...ownershipBadges, ...documentBadges];
+
+  const photos = listing.photoUrls ?? [];
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
       <Link
@@ -63,21 +81,41 @@ export default async function ListingDetailPage({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          {/* Image gallery placeholder */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 sm:grid-rows-2">
-            <div className="plot-border flex h-64 flex-col items-center justify-center gap-2 rounded-lg bg-green-pale text-green/40 sm:col-span-3 sm:row-span-2 sm:h-full">
-              <ImageOff size={36} strokeWidth={1.5} />
-              <span className="coord-label text-green/50">Main photo — {listing.images} total</span>
+          {/* Image gallery */}
+          {photos.length > 0 ? (
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 sm:grid-rows-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photos[0]}
+                alt={listing.title}
+                className="h-64 w-full rounded-lg object-cover sm:col-span-3 sm:row-span-2 sm:h-full"
+              />
+              {photos.slice(1, 3).map((url) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={url}
+                  src={url}
+                  alt={listing.title}
+                  className="hidden h-32 w-full rounded-lg object-cover sm:block"
+                />
+              ))}
             </div>
-            {[1, 2].map((n) => (
-              <div
-                key={n}
-                className="plot-border hidden h-32 items-center justify-center rounded-lg bg-green-pale text-green/40 sm:flex"
-              >
-                <ImageOff size={22} strokeWidth={1.5} />
+          ) : (
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 sm:grid-rows-2">
+              <div className="plot-border flex h-64 flex-col items-center justify-center gap-2 rounded-lg bg-green-pale text-green/40 sm:col-span-3 sm:row-span-2 sm:h-full">
+                <ImageOff size={36} strokeWidth={1.5} />
+                <span className="coord-label text-green/50">Main photo — {listing.images} total</span>
               </div>
-            ))}
-          </div>
+              {[1, 2].map((n) => (
+                <div
+                  key={n}
+                  className="plot-border hidden h-32 items-center justify-center rounded-lg bg-green-pale text-green/40 sm:flex"
+                >
+                  <ImageOff size={22} strokeWidth={1.5} />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Title + price */}
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -144,6 +182,30 @@ export default async function ListingDetailPage({
               ))}
             </div>
           </div>
+
+          {/* Documents & compliance */}
+          {complianceBadges.length > 0 && (
+            <div className="mt-8">
+              <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-navy">
+                <FileCheck2 size={18} className="text-green" />
+                Documents &amp; compliance
+              </h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {complianceBadges.map((badge) => (
+                  <span
+                    key={badge}
+                    className="flex items-center gap-1.5 rounded-full border border-green-bright bg-green-pale px-3 py-1.5 text-sm font-medium text-green"
+                  >
+                    <BadgeCheck size={14} />
+                    {badge}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-muted">
+                As declared by the seller — always verify documents independently.
+              </p>
+            </div>
+          )}
 
           {/* Location placeholder */}
           <div className="mt-8">
