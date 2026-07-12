@@ -584,15 +584,18 @@ export const listings: Listing[] = [
 ];
 
 export const cities = [
-  "Lonavla",
-  "Pune",
   "Mumbai",
   "Navi Mumbai",
-  "Nashik",
+  "Pune",
+  "Delhi NCR",
   "Gurgaon",
-  "Bengaluru",
+  "Noida",
+  "Neemrana",
   "Jaipur",
+  "Lonavla",
+  "Nashik",
   "Dholera",
+  "Bengaluru",
   "Goa",
 ] as const;
 

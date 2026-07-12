@@ -11,18 +11,22 @@ import {
   Tractor,
   Factory,
   Home as HomeIcon,
-  Mountain,
+  Plane,
   Landmark,
+  Gem,
+  Sparkles,
   TrendingUp,
   Lock,
   Layers,
   Check,
   Zap,
+  CalendarDays,
 } from "lucide-react";
 import SearchCard from "@/components/SearchCard";
 import PlotCard from "@/components/PlotCard";
 import GrowthChart from "@/components/GrowthChart";
 import { getLiveListings } from "@/lib/listings-service";
+import { getPublishedArticles } from "@/lib/news-service";
 
 const plotCategories = [
   { type: "Residential", icon: HomeIcon, description: "NA plots ready for homes" },
@@ -39,10 +43,13 @@ const trustStrip = [
   { icon: MessageCircle, title: "WhatsApp connect", text: "Reach owners directly — no broker markup, no middlemen." },
 ];
 
-const cityRoadmap = [
-  { city: "Lonavla", status: "Live now", note: "Home turf — zero organised digital competition", icon: Mountain },
-  { city: "Pune", status: "Next up", note: "65 km away, highest plot volume, IT buyer base", icon: Building2 },
-  { city: "Nashik", status: "Phase 3", note: "Kumbh Mela 2026 demand, agricultural land hub", icon: Landmark },
+const primeMarkets = [
+  { city: "Mumbai & Navi Mumbai", searchCity: "Navi Mumbai", hook: "The airport effect is live", icon: Plane },
+  { city: "Pune", searchCity: "Pune", hook: "India's steadiest plot market outside Mumbai", icon: Building2 },
+  { city: "Delhi NCR", searchCity: "Delhi NCR", hook: "Expressways are redrawing the map", icon: Landmark },
+  { city: "Neemrana", searchCity: "Neemrana", hook: "90 minutes from Delhi, on the DMIC corridor", icon: Factory },
+  { city: "Jaipur", searchCity: "Jaipur", hook: "Heritage city, fast-growing suburbs", icon: Gem },
+  { city: "Dholera SIR", searchCity: "Dholera", hook: "India's first greenfield smart city", icon: Sparkles },
 ];
 
 const plotAdvantages = [
@@ -70,9 +77,14 @@ const pricingTeaser = [
   { name: "Booster", price: "₹499", note: "Pin your listing to the top for 7 days" },
 ];
 
+function formatArticleDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+}
+
 export default async function Home() {
   const listings = await getLiveListings();
   const recentListings = listings.slice(0, 6);
+  const latestArticles = (await getPublishedArticles()).slice(0, 3);
 
   return (
     <>
@@ -267,7 +279,7 @@ export default async function Home() {
                 <GrowthChart />
               </div>
               <p className="mt-3 text-xs text-muted">
-                Illustrative composite index for representative Maharashtra plot markets near
+                Illustrative composite index for representative Indian plot markets near
                 expanding infrastructure corridors. Actual returns vary by location, NA status
                 and market conditions — always do independent due diligence.
               </p>
@@ -276,33 +288,35 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* City roadmap */}
+      {/* Prime markets */}
       <section className="bg-navy py-16 text-paper">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <p className="coord-label text-green-bright">Where we operate</p>
           <h2 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
-            Expanding city by city, not all at once
+            Pan-India, prime market by prime market
           </h2>
           <p className="mt-3 max-w-2xl text-paper/70">
-            We go deep before we go wide — a new city only opens once the current one has 200+
-            active listings and steady weekly inquiries.
+            One national marketplace, live in India&apos;s highest-growth plot corridors — from
+            Mumbai&apos;s new airport belt to Rajasthan&apos;s industrial and smart-city hubs.
           </p>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {cityRoadmap.map((item, i) => {
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {primeMarkets.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.city} className="relative rounded-lg border border-paper/15 p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-md bg-paper/10 text-green-bright">
-                      <Icon size={22} />
-                    </div>
-                    <span className="coord-label text-green-bright">
-                      {item.status === "Live now" ? "● Live now" : `Phase ${i + 1}`}
-                    </span>
+                <Link
+                  key={item.city}
+                  href={`/search?city=${encodeURIComponent(item.searchCity)}`}
+                  className="group relative rounded-lg border border-paper/15 p-6 transition-colors hover:border-green-bright"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-md bg-paper/10 text-green-bright">
+                    <Icon size={22} />
                   </div>
                   <h3 className="mt-4 font-display text-xl font-bold">{item.city}</h3>
-                  <p className="mt-2 text-sm text-paper/70">{item.note}</p>
-                </div>
+                  <p className="mt-2 text-sm text-paper/70">{item.hook}</p>
+                  <span className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-green-bright opacity-0 transition-opacity group-hover:opacity-100">
+                    Browse plots <ArrowRight size={14} />
+                  </span>
+                </Link>
               );
             })}
           </div>
@@ -365,6 +379,59 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      {/* Latest news & insights */}
+      {latestArticles.length > 0 && (
+        <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <p className="coord-label text-green">News &amp; insights</p>
+              <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
+                Latest news &amp; insights
+              </h2>
+            </div>
+            <Link
+              href="/news"
+              className="hidden items-center gap-1.5 font-semibold text-green hover:text-navy sm:flex"
+            >
+              View all news <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {latestArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/news/${article.slug}`}
+                className="plot-border plot-border-hover group flex flex-col gap-3 rounded-lg bg-white p-5 transition-shadow hover:shadow-md"
+              >
+                {article.cityTag && (
+                  <span className="inline-flex w-fit items-center rounded-full bg-green-pale px-2.5 py-1 text-xs font-semibold text-green">
+                    {article.cityTag}
+                  </span>
+                )}
+                <h3 className="font-display text-base font-semibold leading-snug text-navy group-hover:text-green">
+                  {article.title}
+                </h3>
+                {article.excerpt && (
+                  <p className="text-sm text-ink/70 line-clamp-3">{article.excerpt}</p>
+                )}
+                <p className="mt-auto flex items-center gap-1.5 pt-1 text-xs text-muted">
+                  <CalendarDays size={13} />
+                  {formatArticleDate(article.createdAt)}
+                </p>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-8 text-center sm:hidden">
+            <Link
+              href="/news"
+              className="inline-flex items-center gap-1.5 font-semibold text-green hover:text-navy"
+            >
+              View all news <ArrowRight size={16} />
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Contact CTA strip */}
       <section className="bg-paper-dim py-14">

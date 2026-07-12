@@ -36,7 +36,7 @@ const faqs = [
   },
   {
     q: "Which cities does KhaliPlot cover?",
-    a: "We're live in Lonavla, Maharashtra today, and expanding city by city — Pune and Nashik are next on our roadmap.",
+    a: "We're pan-India, live in prime markets including Mumbai, Navi Mumbai, Pune, Delhi NCR, Gurgaon, Noida, Neemrana, Jaipur, Lonavla, Nashik, Dholera, Bengaluru and Goa — with new markets added regularly.",
   },
   {
     q: "How do I contact a seller?",
