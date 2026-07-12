@@ -9,7 +9,7 @@ import { firstName } from "@/lib/profile-data";
 
 const navLinks = [
   { href: "/search", label: "Browse plots" },
-  { href: "/seller", label: "Sell your plot" },
+  { href: "/post-plot", label: "Sell your plot" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#about", label: "About" },
 ];
@@ -124,7 +124,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             </Link>
           )}
           <Link
-            href="/seller"
+            href="/post-plot"
             className="flex items-center gap-1.5 rounded-md bg-amber px-4 py-2 font-semibold text-navy transition-colors hover:bg-amber-dark"
           >
             <Plus size={18} strokeWidth={2.5} />
@@ -189,7 +189,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
               </Link>
             )}
             <Link
-              href="/seller"
+              href="/post-plot"
               className="flex w-fit items-center gap-1.5 rounded-md bg-amber px-4 py-2 font-semibold text-navy"
               onClick={() => setOpen(false)}
             >

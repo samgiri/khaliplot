@@ -372,7 +372,7 @@ export default async function Home() {
             commission on your first plots.
           </p>
           <Link
-            href="/seller"
+            href="/post-plot"
             className="mt-6 inline-flex items-center gap-2 rounded-md bg-amber px-6 py-3 font-semibold text-navy transition-colors hover:bg-navy hover:text-paper"
           >
             Post your plot <ArrowRight size={18} />

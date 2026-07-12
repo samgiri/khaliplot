@@ -2,25 +2,58 @@ import Link from "next/link";
 import { MapPin, Compass, BadgeCheck, ImageOff } from "lucide-react";
 import { Listing, formatPrice, formatArea } from "@/lib/data";
 
+const STATUS_BADGE_STYLES: Record<string, string> = {
+  live: "bg-green-pale text-green",
+  sold: "bg-line text-muted",
+  removed: "bg-amber/20 text-amber-dark",
+  draft: "bg-amber/20 text-amber-dark",
+  pending: "bg-amber/20 text-amber-dark",
+  rejected: "bg-red-100 text-red-700",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  live: "Active",
+  sold: "Sold",
+  removed: "Removed",
+  draft: "Draft",
+  pending: "Pending",
+  rejected: "Rejected",
+};
+
 export default function PlotCard({ listing }: { listing: Listing }) {
+  const coverPhoto = listing.photoUrls?.[0];
+
   return (
     <Link
       href={`/listing/${listing.id}`}
       className="plot-border plot-border-hover group flex flex-col overflow-hidden rounded-lg bg-white transition-shadow hover:shadow-md"
     >
       <div className="relative flex h-44 items-center justify-center bg-green-pale">
-        <div className="flex flex-col items-center gap-1.5 text-green/40">
-          <ImageOff size={28} strokeWidth={1.5} />
-          <span className="coord-label text-green/50">{listing.images} photos</span>
-        </div>
+        {coverPhoto ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={coverPhoto} alt={listing.title} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex flex-col items-center gap-1.5 text-green/40">
+            <ImageOff size={28} strokeWidth={1.5} />
+            <span className="coord-label text-green/50">{listing.images} photos</span>
+          </div>
+        )}
         <span className="absolute left-3 top-3 rounded-full bg-navy px-2.5 py-1 text-xs font-semibold text-paper">
           {listing.plotType}
         </span>
-        {listing.verified && (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-green-bright/95 px-2.5 py-1 text-xs font-semibold text-navy">
-            <BadgeCheck size={14} />
-            Verified
+        {listing.status && listing.status !== "live" ? (
+          <span
+            className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_BADGE_STYLES[listing.status] ?? "bg-line text-muted"}`}
+          >
+            {STATUS_LABELS[listing.status] ?? listing.status}
           </span>
+        ) : (
+          listing.verified && (
+            <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-green-bright/95 px-2.5 py-1 text-xs font-semibold text-navy">
+              <BadgeCheck size={14} />
+              Verified
+            </span>
+          )
         )}
       </div>
 

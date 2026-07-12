@@ -1,27 +1,8 @@
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
-import SellerDashboardClient from "./SellerDashboardClient";
 
-export const metadata = {
-  title: "Seller Dashboard | KhaliPlot.in",
-  description: "Manage your plot listings, track leads, and post new plots on KhaliPlot.in.",
-  robots: { index: false, follow: false },
-};
-
-export default async function SellerPage() {
-  const configured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  if (!configured) {
-    redirect("/login");
-  }
-
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  return <SellerDashboardClient />;
+// /seller was the pre-Part-3 mock seller dashboard stub. It's superseded by
+// the real /post-plot + /my-listings flow, so this route just redirects —
+// keeping the URL alive for anyone with it bookmarked or linked externally.
+export default function SellerPage() {
+  redirect("/post-plot");
 }

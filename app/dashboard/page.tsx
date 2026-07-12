@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Search, Plus, UserCircle } from "lucide-react";
+import { Search, Plus, UserCircle, List } from "lucide-react";
 import { getSessionProfile } from "@/lib/profile-service";
 import { isProfileComplete, firstName, ROLE_OPTIONS } from "@/lib/profile-data";
 
@@ -11,7 +11,8 @@ export const metadata = {
 
 const quickLinks = [
   { href: "/search", label: "Browse plots", icon: Search },
-  { href: "/seller", label: "Post a plot", icon: Plus },
+  { href: "/post-plot", label: "Post a plot", icon: Plus },
+  { href: "/my-listings", label: "My listings", icon: List },
   { href: "/profile", label: "My profile", icon: UserCircle },
 ];
 
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
   const roleLabel = ROLE_OPTIONS.find((r) => r.value === profile.role)?.label ?? profile.role;
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8">
+    <div className="mx-auto max-w-4xl px-5 py-14 sm:px-8">
       <p className="coord-label text-green">Dashboard</p>
       <h1 className="mt-1 font-display text-2xl font-bold text-navy sm:text-3xl">
         Namaste, {firstName(profile.name)} 👋
@@ -38,7 +39,7 @@ export default async function DashboardPage() {
         {roleLabel}
       </span>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {quickLinks.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}

@@ -28,6 +28,21 @@ export interface Listing {
   sellerPhone: string;
   coordinates: { lat: number; lng: number };
   images: number; // count placeholder
+  sellerId?: string | null;
+  status?: string;
+  mapsLink?: string | null;
+  areaUnit?: string;
+  areaValue?: number | null;
+  pricePerUnit?: number | null;
+  ownershipType?: string | null;
+  transactionType?: string | null;
+  naStatus?: string | null;
+  documents?: import("./listing-form-data").ListingDocuments;
+  cornerPlot?: boolean | null;
+  boundaryWall?: boolean | null;
+  gatedLayout?: boolean | null;
+  possession?: string | null;
+  photoUrls?: string[];
 }
 
 export const listings: Listing[] = [
