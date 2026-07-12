@@ -70,14 +70,21 @@ export function parseListingFields(
   }
   const areaSqft = toSqft(areaValue, areaUnit);
 
-  const price = Number(body.price);
-  if (!price || price <= 0) {
+  // The form collects price in ₹ Lakh (matching how Indian real estate is
+  // priced/discussed) — price_lakh is stored as-is; totalRupees is only an
+  // intermediate used to compute the genuinely rupee-denominated columns
+  // (price_per_sqft, price_per_unit).
+  const priceLakh = Number(body.priceLakh);
+  if (!priceLakh || priceLakh <= 0) {
     return { error: "Please enter a valid price." };
   }
-  const priceLakh = price / 100000;
-  const pricePerSqft = price / areaSqft;
+  const totalRupees = priceLakh * 100000;
+  if (totalRupees < 10000) {
+    return { error: "That price looks too low — please check the amount (minimum ₹10,000)." };
+  }
+  const pricePerSqft = totalRupees / areaSqft;
   const overridePerUnit = Number(body.pricePerUnitOverride);
-  const pricePerUnit = overridePerUnit > 0 ? overridePerUnit : price / areaValue;
+  const pricePerUnit = overridePerUnit > 0 ? overridePerUnit : totalRupees / areaValue;
 
   const ownershipType = (OWNERSHIP_TYPES as readonly string[]).includes(body.ownershipType as string)
     ? (body.ownershipType as string)
