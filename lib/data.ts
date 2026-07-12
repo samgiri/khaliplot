@@ -624,8 +624,9 @@ export const plotTypes: PlotType[] = [
 
 export function formatPrice(priceLakh: number): string {
   if (priceLakh >= 100) {
-    const crore = priceLakh / 100;
-    return `₹${crore.toFixed(crore % 1 === 0 ? 0 : 2)} Cr`;
+    // Round to 2 decimals then drop trailing zeros: 1.20 -> "1.2", 4.80 -> "4.8".
+    const crore = Math.round((priceLakh / 100) * 100) / 100;
+    return `₹${crore} Cr`;
   }
   return `₹${priceLakh.toFixed(priceLakh % 1 === 0 ? 0 : 1)} Lakh`;
 }

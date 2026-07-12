@@ -16,7 +16,7 @@ import {
   ChevronDown,
   CheckCircle2,
 } from "lucide-react";
-import { cities as ALL_CITIES, plotTypes, formatPrice, type Listing } from "@/lib/data";
+import { cities as ALL_CITIES, plotTypes, type Listing } from "@/lib/data";
 import { INDIAN_STATES, PRIME_CITIES, OTHER_CITY } from "@/lib/profile-data";
 import { AREA_UNITS, toSqft, unitLabel, formatIndianRupees, type AreaUnit } from "@/lib/listing-units";
 import { getLandRecordLabel } from "@/lib/land-records";
@@ -76,18 +76,20 @@ export default function PostPlotForm({
   // Size & price
   const [areaUnit, setAreaUnit] = useState<AreaUnit>((initial?.areaUnit as AreaUnit) ?? "sqft");
   const [areaValue, setAreaValue] = useState(initial?.areaValue ? String(initial.areaValue) : "");
-  const [price, setPrice] = useState(initial ? String(Math.round(initial.priceLakh * 100000)) : "");
+  const [priceLakh, setPriceLakh] = useState(initial ? String(initial.priceLakh) : "");
   const [perUnitTouched, setPerUnitTouched] = useState(false);
   const [pricePerUnitInput, setPricePerUnitInput] = useState(
     initial?.pricePerUnit ? String(Math.round(initial.pricePerUnit)) : ""
   );
 
   const areaValueNum = Number(areaValue) || 0;
-  const priceNum = Number(price) || 0;
+  const priceLakhNum = Number(priceLakh) || 0;
+  const totalRupees = priceLakhNum * 100000;
   const areaSqft = areaValueNum > 0 ? toSqft(areaValueNum, areaUnit) : 0;
-  const pricePerSqft = areaSqft > 0 && priceNum > 0 ? priceNum / areaSqft : 0;
-  const computedPricePerUnit = areaValueNum > 0 && priceNum > 0 ? priceNum / areaValueNum : 0;
+  const pricePerSqft = areaSqft > 0 && totalRupees > 0 ? totalRupees / areaSqft : 0;
+  const computedPricePerUnit = areaValueNum > 0 && totalRupees > 0 ? totalRupees / areaValueNum : 0;
   const displayedPricePerUnit = perUnitTouched && pricePerUnitInput ? Number(pricePerUnitInput) : computedPricePerUnit;
+  const priceTooLow = totalRupees > 0 && totalRupees < 10000;
 
   // Title
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -175,7 +177,7 @@ export default function PostPlotForm({
   }
 
   async function handleGenerateDescription() {
-    if (!city || !state || !areaValueNum || !priceNum) {
+    if (!city || !state || !areaValueNum || !priceLakhNum) {
       setErrorMessage("Fill in location, size and price first, then generate a description.");
       setStatus("error");
       return;
@@ -192,7 +194,7 @@ export default function PostPlotForm({
           locality,
           areaUnit,
           areaValue: areaValueNum,
-          priceLakh: priceNum / 100000,
+          priceLakh: priceLakhNum,
           naStatus,
           hint,
         }),
@@ -210,6 +212,13 @@ export default function PostPlotForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (priceTooLow) {
+      setErrorMessage("That price looks too low — please check the amount (minimum ₹10,000).");
+      setStatus("error");
+      return;
+    }
+
     setStatus("loading");
     setErrorMessage("");
 
@@ -222,7 +231,7 @@ export default function PostPlotForm({
       mapsLink,
       areaUnit,
       areaValue: areaValueNum,
-      price: priceNum,
+      priceLakh: priceLakhNum,
       pricePerUnitOverride: perUnitTouched ? Number(pricePerUnitInput) : undefined,
       ownershipType,
       transactionType,
@@ -389,24 +398,29 @@ export default function PostPlotForm({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-navy">Total price (₹)</label>
+            <label className="text-sm font-semibold text-navy">Price (₹ Lakh)</label>
             <input
               required
               type="number"
               min="0"
               step="any"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g. 4200000"
+              value={priceLakh}
+              onChange={(e) => setPriceLakh(e.target.value)}
+              placeholder="e.g. 67.5"
               className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
             />
-            {priceNum > 0 && (
-              <p className="text-xs text-muted">{formatIndianRupees(priceNum)} · {formatPrice(priceNum / 100000)}</p>
+            {totalRupees > 0 && (
+              <p className="text-xs text-muted">= {formatIndianRupees(totalRupees)}</p>
+            )}
+            {priceTooLow && (
+              <p className="text-xs text-amber-dark">
+                That price looks too low — minimum is ₹10,000 (0.1 Lakh).
+              </p>
             )}
           </div>
         </div>
 
-        {areaValueNum > 0 && priceNum > 0 && (
+        {areaValueNum > 0 && totalRupees > 0 && (
           <div className="grid grid-cols-1 gap-4 rounded-lg border border-line bg-paper-dim p-4 sm:grid-cols-2">
             <div>
               <p className="coord-label">₹ per sq ft</p>
@@ -727,7 +741,7 @@ export default function PostPlotForm({
 
       <button
         type="submit"
-        disabled={status === "loading" || anyUploading}
+        disabled={status === "loading" || anyUploading || priceTooLow}
         className="flex w-full items-center justify-center gap-2 rounded-md bg-amber px-6 py-3.5 font-semibold text-navy transition-colors hover:bg-amber-dark disabled:opacity-60 sm:w-auto"
       >
         {status === "loading" ? (
