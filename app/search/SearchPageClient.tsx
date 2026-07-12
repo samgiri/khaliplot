@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, X } from "lucide-react";
 import PlotCard from "@/components/PlotCard";
-import { cities, plotTypes, Listing } from "@/lib/data";
+import { cities, plotTypes, Listing, formatLocation } from "@/lib/data";
 
 const sortOptions = [
   { value: "newest", label: "Newest first" },
@@ -25,15 +25,27 @@ export default function SearchPageClient({
   const savedSet = useMemo(() => new Set(savedPlotIds), [savedPlotIds]);
 
   const [city, setCity] = useState(searchParams.get("city") || "");
+  const [locality, setLocality] = useState("");
   const [type, setType] = useState(searchParams.get("type") || "");
   const [budget, setBudget] = useState(searchParams.get("budget") || "");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sort, setSort] = useState("newest");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  const localityOptions = useMemo(() => {
+    if (!city) return [];
+    return Array.from(new Set(listings.filter((l) => l.city === city).map((l) => l.locality))).sort();
+  }, [listings, city]);
+
+  function selectCity(c: string) {
+    setCity(c);
+    setLocality("");
+  }
+
   const filtered = useMemo(() => {
     let result = listings.filter((l) => {
       if (city && l.city !== city) return false;
+      if (locality && l.locality !== locality) return false;
       if (type && l.plotType !== type) return false;
       if (budget && l.priceLakh > Number(budget)) return false;
       if (verifiedOnly && !l.verified) return false;
@@ -54,12 +66,13 @@ export default function SearchPageClient({
         result = [...result].sort((a, b) => a.postedDaysAgo - b.postedDaysAgo);
     }
     return result;
-  }, [city, type, budget, verifiedOnly, sort]);
+  }, [city, locality, type, budget, verifiedOnly, sort]);
 
-  const activeFilterCount = [city, type, budget, verifiedOnly].filter(Boolean).length;
+  const activeFilterCount = [city, locality, type, budget, verifiedOnly].filter(Boolean).length;
 
   function clearFilters() {
     setCity("");
+    setLocality("");
     setType("");
     setBudget("");
     setVerifiedOnly(false);
@@ -73,7 +86,7 @@ export default function SearchPageClient({
           {["", ...cities].map((c) => (
             <button
               key={c || "all"}
-              onClick={() => setCity(c)}
+              onClick={() => selectCity(c)}
               className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 city === c
                   ? "border-green bg-green text-paper"
@@ -85,6 +98,27 @@ export default function SearchPageClient({
           ))}
         </div>
       </div>
+
+      {city && localityOptions.length > 0 && (
+        <div>
+          <h3 className="coord-label mb-3 text-navy/60">Locality in {city}</h3>
+          <div className="flex flex-wrap gap-2">
+            {["", ...localityOptions].map((loc) => (
+              <button
+                key={loc || "all"}
+                onClick={() => setLocality(loc)}
+                className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                  locality === loc
+                    ? "border-green bg-green text-paper"
+                    : "border-line bg-white text-ink hover:border-green-bright"
+                }`}
+              >
+                {loc || "All localities"}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
         <h3 className="coord-label mb-3 text-navy/60">Plot type</h3>
@@ -159,7 +193,7 @@ export default function SearchPageClient({
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
       <div className="mb-6">
         <h1 className="font-display text-2xl font-bold text-navy sm:text-3xl">
-          {city ? `Plots in ${city}` : "All plots"}
+          {city ? `Plots in ${formatLocation(locality, city)}` : "All plots"}
           {type ? ` · ${type}` : ""}
         </h1>
         <p className="mt-1 text-sm text-muted">

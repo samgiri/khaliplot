@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getSessionProfile } from "@/lib/profile-service";
 import { isProfileComplete } from "@/lib/profile-data";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import { getSellerListingById } from "@/lib/listings-service";
+import { getSellerListingById, getLiveListings } from "@/lib/listings-service";
 import PostPlotForm from "./PostPlotForm";
 
 export const metadata = {
@@ -33,6 +33,13 @@ export default async function PostPlotPage({
     }
   }
 
+  const allListings = await getLiveListings();
+  const localitySuggestions = Array.from(
+    new Map(
+      allListings.map((l) => [`${l.city}|${l.locality}`, { city: l.city, locality: l.locality }])
+    ).values()
+  );
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-10 sm:px-8 sm:py-14">
       <p className="coord-label text-green">{edit ? "Edit plot" : "Post a plot"}</p>
@@ -44,7 +51,7 @@ export default async function PostPlotPage({
       </p>
 
       <div className="mt-6">
-        <PostPlotForm editingId={edit} initial={initial} />
+        <PostPlotForm editingId={edit} initial={initial} localitySuggestions={localitySuggestions} />
       </div>
     </div>
   );

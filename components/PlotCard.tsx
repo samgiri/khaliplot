@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MapPin, Compass, BadgeCheck, ImageOff } from "lucide-react";
-import { Listing, formatPrice, formatArea } from "@/lib/data";
+import { Listing, formatPrice, formatArea, formatLocation } from "@/lib/data";
 import SaveButton from "@/components/SaveButton";
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
@@ -78,7 +78,7 @@ export default function PlotCard({
 
         <p className="flex items-center gap-1.5 text-sm text-muted">
           <MapPin size={14} className="shrink-0" />
-          {listing.locality}, {listing.city}
+          {formatLocation(listing.locality, listing.city)}
         </p>
 
         <div className="plot-divider my-1" />

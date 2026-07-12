@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   FileCheck2,
 } from "lucide-react";
-import { formatPrice, formatArea } from "@/lib/data";
+import { formatPrice, formatArea, formatLocation } from "@/lib/data";
 import { getLiveListingById, getLiveListings } from "@/lib/listings-service";
 import { DOCUMENT_BADGE_LABELS, type DocumentKey } from "@/lib/listing-form-data";
 import { getLandRecordLabel } from "@/lib/land-records";
@@ -68,10 +68,12 @@ export default async function ListingDetailPage({
     { label: "Area", value: formatArea(listing.areaSqft), icon: Ruler },
     { label: "Dimensions", value: listing.dimensions, icon: Ruler },
     { label: "Facing", value: listing.facing, icon: Compass },
-    { label: "Road width", value: `${listing.roadWidthFt} ft`, icon: Road },
+    listing.roadWidthFt > 0 ? { label: "Road width", value: `${listing.roadWidthFt} ft`, icon: Road } : null,
     { label: "Zone", value: listing.zone, icon: ShieldCheck },
     { label: "Price/sqft", value: `₹${listing.pricePerSqft.toLocaleString("en-IN")}`, icon: BadgeCheck },
-  ];
+  ].filter(
+    (fact): fact is { label: string; value: string; icon: typeof Ruler } => Boolean(fact && fact.value)
+  );
 
   const documents = listing.documents ?? {};
   const documentBadges = (Object.keys(DOCUMENT_BADGE_LABELS) as DocumentKey[])
@@ -155,7 +157,7 @@ export default async function ListingDetailPage({
               </h1>
               <p className="mt-1 flex items-center gap-1.5 text-muted">
                 <MapPin size={15} />
-                {listing.locality}, {listing.city}, {listing.state}
+                {formatLocation(listing.locality, listing.city, listing.state)}
               </p>
             </div>
             <div className="flex flex-col items-start gap-3 sm:items-end">
