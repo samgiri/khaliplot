@@ -154,6 +154,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/news" className="text-paper/80 hover:text-green-bright">
+                  News
+                </Link>
+              </li>
+              <li>
                 <Link href="/pricing" className="text-paper/80 hover:text-green-bright">
                   Pricing
                 </Link>
