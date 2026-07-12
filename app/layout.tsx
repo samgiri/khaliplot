@@ -32,7 +32,12 @@ export const metadata: Metadata = {
     "Buy, sell and find vacant plots and land across India. Verified listings, direct contact with owners, zero brokerage hassle.",
 };
 
-async function getUserEmail(): Promise<string | null> {
+interface HeaderUser {
+  email: string;
+  name: string | null;
+}
+
+async function getHeaderUser(): Promise<HeaderUser | null> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return null;
   }
@@ -41,7 +46,15 @@ async function getUserEmail(): Promise<string | null> {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    return user?.email ?? null;
+    if (!user?.email) return null;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return { email: user.email, name: profile?.name ?? null };
   } catch {
     return null;
   }
@@ -52,7 +65,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userEmail = await getUserEmail();
+  const user = await getHeaderUser();
 
   return (
     <html
@@ -60,7 +73,7 @@ export default async function RootLayout({
       className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
-        <Header userEmail={userEmail} />
+        <Header user={user} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
