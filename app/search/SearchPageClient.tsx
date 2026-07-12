@@ -13,9 +13,16 @@ const sortOptions = [
   { value: "area-large", label: "Area: Largest first" },
 ];
 
-export default function SearchPageClient({ initialListings }: { initialListings: Listing[] }) {
+export default function SearchPageClient({
+  initialListings,
+  savedPlotIds = [],
+}: {
+  initialListings: Listing[];
+  savedPlotIds?: string[];
+}) {
   const searchParams = useSearchParams();
   const listings = initialListings;
+  const savedSet = useMemo(() => new Set(savedPlotIds), [savedPlotIds]);
 
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [type, setType] = useState(searchParams.get("type") || "");
@@ -234,7 +241,7 @@ export default function SearchPageClient({ initialListings }: { initialListings:
           {filtered.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {filtered.map((listing) => (
-                <PlotCard key={listing.id} listing={listing} />
+                <PlotCard key={listing.id} listing={listing} isSaved={savedSet.has(listing.id)} />
               ))}
             </div>
           ) : (

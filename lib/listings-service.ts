@@ -159,6 +159,31 @@ export async function getLiveListingById(id: string): Promise<Listing | undefine
 }
 
 /**
+ * Fetch listings by id, in whatever order Supabase returns them. Used by
+ * the buyer dashboard to resolve saved_plots/inquiries/contact_reveals rows
+ * (which only store plot_id) into displayable listings. Uses the public
+ * anon client like getLiveListings — a listing that's no longer status =
+ * 'live' (sold/removed) will simply be omitted, since RLS only allows
+ * public reads of live rows; that's an acceptable, minor limitation rather
+ * than a reason to touch listings RLS for this display-only feature.
+ */
+export async function getListingsByIds(ids: string[]): Promise<Listing[]> {
+  if (ids.length === 0) return [];
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return seedListings.filter((l) => ids.includes(l.id));
+  }
+
+  try {
+    const { data, error } = await supabase.from("listings").select(PUBLIC_LISTING_COLUMNS).in("id", ids);
+    if (error || !data) return [];
+    return (data as unknown as ListingRow[]).map(rowToListing);
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Fetch every listing owned by a seller, regardless of status — used by
  * /my-listings. Takes the caller's session-bound Supabase client so RLS
  * ("Sellers can view own listings regardless of status") applies; never

@@ -114,7 +114,7 @@ export default function MyListingsClient({
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {visibleListings.map((listing) => (
             <div key={listing.id} className="flex flex-col gap-2">
-              <PlotCard listing={listing} />
+              <PlotCard listing={listing} showSaveButton={false} />
               <div className="flex gap-2">
                 <Link
                   href={`/post-plot?edit=${listing.id}`}

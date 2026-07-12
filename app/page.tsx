@@ -27,6 +27,7 @@ import PlotCard from "@/components/PlotCard";
 import GrowthChart from "@/components/GrowthChart";
 import { getLiveListings } from "@/lib/listings-service";
 import { getPublishedArticles } from "@/lib/news-service";
+import { getCurrentUserSavedPlotIds } from "@/lib/dashboard-service";
 
 const plotCategories = [
   { type: "Residential", icon: HomeIcon, description: "NA plots ready for homes" },
@@ -85,6 +86,7 @@ export default async function Home() {
   const listings = await getLiveListings();
   const recentListings = listings.slice(0, 6);
   const latestArticles = (await getPublishedArticles()).slice(0, 3);
+  const savedPlotIds = await getCurrentUserSavedPlotIds();
 
   return (
     <>
@@ -187,7 +189,7 @@ export default async function Home() {
           {recentListings.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {recentListings.map((listing) => (
-                <PlotCard key={listing.id} listing={listing} />
+                <PlotCard key={listing.id} listing={listing} isSaved={savedPlotIds.has(listing.id)} />
               ))}
             </div>
           ) : (

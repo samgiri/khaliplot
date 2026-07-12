@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MapPin, Compass, BadgeCheck, ImageOff } from "lucide-react";
 import { Listing, formatPrice, formatArea } from "@/lib/data";
+import SaveButton from "@/components/SaveButton";
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   live: "bg-green-pale text-green",
@@ -20,7 +21,15 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: "Rejected",
 };
 
-export default function PlotCard({ listing }: { listing: Listing }) {
+export default function PlotCard({
+  listing,
+  isSaved = false,
+  showSaveButton = true,
+}: {
+  listing: Listing;
+  isSaved?: boolean;
+  showSaveButton?: boolean;
+}) {
   const coverPhoto = listing.photoUrls?.[0];
 
   return (
@@ -54,6 +63,11 @@ export default function PlotCard({ listing }: { listing: Listing }) {
               Verified
             </span>
           )
+        )}
+        {showSaveButton && (
+          <div className="absolute bottom-3 right-3">
+            <SaveButton plotId={listing.id} initialSaved={isSaved} />
+          </div>
         )}
       </div>
 
