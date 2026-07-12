@@ -7,7 +7,6 @@ import {
   Road,
   BadgeCheck,
   Phone,
-  MessageCircle,
   ImageOff,
   ArrowLeft,
   ShieldCheck,
@@ -238,14 +237,12 @@ export default async function ListingDetailPage({
               {listing.sellerPhone || "Contact hidden — reveal coming soon"}
             </p>
 
-            <div className="mt-5 flex flex-col gap-2.5">
-              <button className="flex items-center justify-center gap-2 rounded-md bg-green px-4 py-3 font-semibold text-paper transition-colors hover:bg-navy">
-                <Phone size={18} />
-                Call seller
-              </button>
-              <button className="flex items-center justify-center gap-2 rounded-md border border-green bg-green-pale px-4 py-3 font-semibold text-green transition-colors hover:bg-green hover:text-paper">
-                <MessageCircle size={18} />
-                WhatsApp
+            <div className="mt-5">
+              <button
+                disabled
+                className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md border border-line bg-paper-dim px-4 py-3 font-semibold text-muted"
+              >
+                🔒 Reveal contact — coming soon
               </button>
             </div>
 
