@@ -16,7 +16,10 @@ import { formatPrice, formatArea } from "@/lib/data";
 import { getLiveListingById, getLiveListings } from "@/lib/listings-service";
 import { DOCUMENT_BADGE_LABELS, type DocumentKey } from "@/lib/listing-form-data";
 import { getLandRecordLabel } from "@/lib/land-records";
+import { getCurrentUserSavedPlotIds, recordListingView } from "@/lib/dashboard-service";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import PlotCard from "@/components/PlotCard";
+import SaveButton from "@/components/SaveButton";
 
 export const revalidate = 60;
 
@@ -43,6 +46,23 @@ export default async function ListingDetailPage({
   const similar = allListings
     .filter((l) => l.id !== listing.id && l.city === listing.city)
     .slice(0, 3);
+
+  const savedPlotIds = await getCurrentUserSavedPlotIds();
+  const isSaved = savedPlotIds.has(listing.id);
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    try {
+      const supabase = await createSupabaseServerClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await recordListingView(supabase, user.id, listing.id);
+      }
+    } catch {
+      // best-effort view tracking — never blocks the page
+    }
+  }
 
   const keyFacts = [
     { label: "Area", value: formatArea(listing.areaSqft), icon: Ruler },
@@ -138,13 +158,16 @@ export default async function ListingDetailPage({
                 {listing.locality}, {listing.city}, {listing.state}
               </p>
             </div>
-            <div className="text-left sm:text-right">
-              <p className="font-display text-3xl font-bold text-navy">
-                {formatPrice(listing.priceLakh)}
-              </p>
-              <p className="text-sm text-muted">
-                ₹{listing.pricePerSqft.toLocaleString("en-IN")}/sqft
-              </p>
+            <div className="flex flex-col items-start gap-3 sm:items-end">
+              <div className="text-left sm:text-right">
+                <p className="font-display text-3xl font-bold text-navy">
+                  {formatPrice(listing.priceLakh)}
+                </p>
+                <p className="text-sm text-muted">
+                  ₹{listing.pricePerSqft.toLocaleString("en-IN")}/sqft
+                </p>
+              </div>
+              <SaveButton plotId={listing.id} initialSaved={isSaved} variant="labeled" />
             </div>
           </div>
 
@@ -261,7 +284,7 @@ export default async function ListingDetailPage({
           </h2>
           <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {similar.map((s) => (
-              <PlotCard key={s.id} listing={s} />
+              <PlotCard key={s.id} listing={s} isSaved={savedPlotIds.has(s.id)} />
             ))}
           </div>
         </div>
