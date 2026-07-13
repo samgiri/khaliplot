@@ -219,12 +219,12 @@ export default function PostPlotForm({
       const compressed = await compressImage(file);
       const path = `${user.id}/${key}.jpg`;
       const { error: uploadError } = await supabase.storage
-        .from("listing-photos")
+        .from("photos")
         .upload(path, compressed, { contentType: "image/jpeg", upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: publicUrl } = supabase.storage.from("listing-photos").getPublicUrl(path);
+      const { data: publicUrl } = supabase.storage.from("photos").getPublicUrl(path);
       setPhotos((prev) =>
         prev.map((p) => (p.key === key ? { ...p, status: "done", url: publicUrl.publicUrl } : p))
       );
