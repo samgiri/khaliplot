@@ -8,7 +8,7 @@ import { Menu, X, Plus, ChevronDown, LayoutDashboard, UserCircle, LogOut } from 
 import { firstName } from "@/lib/profile-data";
 
 const navLinks = [
-  { href: "/search", label: "Buy Plot" },
+  { href: "/browse", label: "Buy Plot" },
   { href: "/post-plot", label: "Sell Plot" },
   { href: "/pricing", label: "Package" },
   { href: "/contact", label: "Connect Us" },

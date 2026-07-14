@@ -6,7 +6,7 @@ import type { ListingDocuments } from "@/lib/listing-form-data";
 // Columns safe to expose publicly. seller_phone is deliberately excluded —
 // it's only readable via the service role key, and will only reach a buyer
 // through the contact-reveal flow (quota-checked, server-side).
-const PUBLIC_LISTING_COLUMNS =
+export const PUBLIC_LISTING_COLUMNS =
   "id, title, plot_type, city, locality, state, area_sqft, price_lakh, " +
   "price_per_sqft, facing, road_width_ft, dimensions, zone, features, " +
   "description, verified, status, seller_id, seller_name, seller_type, lat, lng, " +
@@ -15,7 +15,7 @@ const PUBLIC_LISTING_COLUMNS =
   "corner_plot, boundary_wall, gated_layout, possession, photo_urls";
 
 // Database row shape (snake_case, as stored in Supabase)
-interface ListingRow {
+export interface ListingRow {
   id: string;
   title: string;
   plot_type: string;
@@ -61,7 +61,7 @@ function daysAgo(dateString: string): number {
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
 }
 
-function rowToListing(row: ListingRow): Listing {
+export function rowToListing(row: ListingRow): Listing {
   return {
     id: row.id,
     title: row.title,
