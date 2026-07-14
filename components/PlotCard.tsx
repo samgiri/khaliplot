@@ -37,7 +37,7 @@ export default function PlotCard({
       href={`/listing/${listing.id}`}
       className="plot-border plot-border-hover group flex flex-col overflow-hidden rounded-lg bg-white transition-shadow hover:shadow-md"
     >
-      <div className="relative flex h-44 items-center justify-center bg-green-pale">
+      <div className="relative flex aspect-video items-center justify-center bg-green-pale">
         {coverPhoto ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={coverPhoto} alt={listing.title} className="h-full w-full object-cover" />

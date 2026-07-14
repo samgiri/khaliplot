@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Heart, Loader2 } from "lucide-react";
+import { showToast } from "@/components/Toaster";
 
 interface SaveButtonProps {
   plotId: string;
@@ -38,16 +39,20 @@ export default function SaveButton({
       });
 
       if (res.status === 401) {
-        router.push("/login");
-        setSaved(!nextSaved);
+        setSaved(!nextSaved); // revert optimistic change
+        showToast("Sign in to save plots", "info");
         return;
       }
       if (!res.ok) {
         setSaved(!nextSaved); // revert on failure
+        showToast("Something went wrong. Try again.", "info");
+        return;
       }
+      showToast(nextSaved ? "Plot saved!" : "Removed from saved");
       router.refresh();
     } catch {
       setSaved(!nextSaved);
+      showToast("Something went wrong. Try again.", "info");
     } finally {
       setBusy(false);
     }

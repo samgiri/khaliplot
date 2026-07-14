@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingChatbox from "@/components/FloatingChatbox";
+import Toaster from "@/components/Toaster";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const syne = Syne({
@@ -78,6 +79,7 @@ export default async function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <FloatingChatbox />
+        <Toaster />
       </body>
     </html>
   );
