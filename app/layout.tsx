@@ -3,6 +3,7 @@ import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import FloatingChatbox from "@/components/FloatingChatbox";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const syne = Syne({
@@ -76,6 +77,7 @@ export default async function RootLayout({
         <Header user={user} />
         <main className="flex-1">{children}</main>
         <Footer />
+        <FloatingChatbox />
       </body>
     </html>
   );

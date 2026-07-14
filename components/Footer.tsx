@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 function InstagramIcon() {
   return (
@@ -81,14 +81,15 @@ export default function Footer() {
             </p>
             <div className="mt-5 flex gap-3">
               {[
-                { icon: InstagramIcon, label: "Instagram" },
-                { icon: YoutubeIcon, label: "YouTube" },
-                { icon: FacebookIcon, label: "Facebook" },
-                { icon: LinkedinIcon, label: "LinkedIn" },
-              ].map(({ icon: Icon, label }) => (
+                { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/khaliplot" },
+                { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@khaliplot" },
+                { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/khaliplot" },
+                { icon: LinkedinIcon, label: "LinkedIn", href: "#" },
+              ].map(({ icon: Icon, label, href }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={href}
+                  {...(href !== "#" ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                   aria-label={label}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/10 transition-transform hover:-translate-y-0.5 hover:bg-paper/15"
                 >
@@ -189,10 +190,6 @@ export default function Footer() {
           <div>
             <h3 className="coord-label text-paper/50">Contact</h3>
             <ul className="mt-4 space-y-3 text-sm text-paper/80">
-              <li className="flex items-start gap-2">
-                <MapPin size={16} className="mt-0.5 shrink-0 text-green-bright" />
-                Lonavla, Maharashtra, India
-              </li>
               <li className="flex items-center gap-2">
                 <Mail size={16} className="shrink-0 text-green-bright" />
                 <a href="mailto:hello@khaliplot.in" className="hover:text-green-bright">

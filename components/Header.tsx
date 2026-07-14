@@ -8,10 +8,10 @@ import { Menu, X, Plus, ChevronDown, LayoutDashboard, UserCircle, LogOut } from 
 import { firstName } from "@/lib/profile-data";
 
 const navLinks = [
-  { href: "/search", label: "Browse plots" },
-  { href: "/post-plot", label: "Sell your plot" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/#about", label: "About" },
+  { href: "/search", label: "Buy Plot" },
+  { href: "/post-plot", label: "Sell Plot" },
+  { href: "/pricing", label: "Package" },
+  { href: "/contact", label: "Connect Us" },
 ];
 
 interface HeaderUser {
@@ -68,7 +68,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             <Link
               key={link.href}
               href={link.href}
-              className="font-medium text-navy/80 transition-colors hover:text-green"
+              className="font-display text-lg font-bold text-navy transition-colors hover:text-green"
             >
               {link.label}
             </Link>
@@ -149,7 +149,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-medium text-navy/80"
+                className="font-display text-lg font-bold text-navy"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
