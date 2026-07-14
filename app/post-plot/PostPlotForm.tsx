@@ -55,10 +55,12 @@ export default function PostPlotForm({
   editingId,
   initial,
   localitySuggestions = [],
+  redirectTo = "/my-listings?posted=1",
 }: {
   editingId?: string;
   initial?: Listing | null;
   localitySuggestions?: { city: string; locality: string }[];
+  redirectTo?: string;
 }) {
   const router = useRouter();
 
@@ -359,7 +361,7 @@ export default function PostPlotForm({
         return;
       }
 
-      router.push("/my-listings?posted=1");
+      router.push(redirectTo);
       router.refresh();
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
