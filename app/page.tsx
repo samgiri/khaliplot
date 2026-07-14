@@ -91,20 +91,23 @@ export default async function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-navy text-paper">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-2 lg:gap-16">
+      <section className="relative overflow-hidden bg-paper">
+        <div className="mx-auto flex max-w-7xl flex-col items-center px-5 py-14 text-center sm:px-8 sm:py-20">
           <div className="reveal">
-            <span className="coord-label inline-flex items-center gap-2 rounded-full border border-paper/20 bg-paper/10 px-3 py-1.5 text-green-bright">
+            <span className="coord-label inline-flex items-center gap-2 rounded-full border border-navy/15 bg-white px-3 py-1.5 text-green">
               🇮🇳 India&apos;s dedicated plot marketplace
             </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] text-paper sm:text-5xl lg:text-6xl">
-              Find your perfect <span className="text-amber">Khali Plot</span> across India
+            <h1 className="mx-auto mt-6 max-w-5xl font-display text-5xl font-bold leading-[1.05] text-navy sm:text-6xl lg:text-7xl">
+              India First AI-Powered Land Marketplace
             </h1>
-            <p className="mt-5 max-w-lg text-lg text-paper/70">
+            <p className="mt-5 font-display text-lg font-semibold text-navy/70 sm:text-xl">
+              AI Price Suggestion • AI Score Based on Price
+            </p>
+            <p className="mx-auto mt-4 max-w-lg text-lg text-ink/70">
               Browse verified residential, agricultural &amp; commercial plots directly from
               owners. Zero brokerage. No spam calls. Pan India coverage.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
                 href="/search"
                 className="inline-flex items-center gap-2 rounded-md bg-amber px-6 py-3 font-semibold text-navy transition-colors hover:bg-amber-dark"
@@ -113,12 +116,12 @@ export default async function Home() {
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-md border-2 border-paper/30 px-6 py-3 font-semibold text-paper transition-colors hover:bg-paper/10"
+                className="inline-flex items-center gap-2 rounded-md border-2 border-navy px-6 py-3 font-semibold text-navy transition-colors hover:bg-navy hover:text-paper"
               >
-                <MessageCircle size={18} /> Contact us
+                <MessageCircle size={18} /> Connect us
               </Link>
             </div>
-            <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-paper/60">
+            <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-muted">
               <span>RERA verified listings</span>
               <span aria-hidden="true">·</span>
               <span>Direct owner contact</span>
@@ -127,7 +130,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="reveal" style={{ animationDelay: "0.15s" }}>
+          <div className="reveal mt-10 w-full max-w-2xl" style={{ animationDelay: "0.15s" }}>
             <SearchCard />
           </div>
         </div>
