@@ -21,6 +21,10 @@
   --color-blue: #2563a8;
   --color-whatsapp: #25d366;
   --color-whatsapp-hover: #20ba5b;
+  /* Indian-flag trust accents — used ONLY for trust/verification badges,
+     never for primary UI (navy + amber stay the design lock). */
+  --color-saffron: #ff9933;
+  --color-india-green: #138808;
   --color-email: #ea4335;
   --color-email-hover: #d33127;
   --color-email-brand: #0078d4;
@@ -59,6 +63,8 @@
   --color-blue: var(--color-blue);
   --color-whatsapp: var(--color-whatsapp);
   --color-whatsapp-hover: var(--color-whatsapp-hover);
+  --color-saffron: var(--color-saffron);
+  --color-india-green: var(--color-india-green);
   --color-email: var(--color-email);
   --color-email-hover: var(--color-email-hover);
   --color-email-brand: var(--color-email-brand);

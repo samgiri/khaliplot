@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import PlotCard from "@/components/PlotCard";
 import FilterBar, { EMPTY_FILTERS, type FilterValues } from "@/components/FilterBar";
+import UnitConverterButton from "@/components/UnitConverterModal";
 import type { BrowsePage } from "@/lib/browse-service";
 import type { Listing } from "@/lib/data";
 
@@ -127,11 +128,14 @@ export default function BrowseClient({
       />
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold text-navy sm:text-3xl">Browse plots</h1>
-          <p className="mt-1 text-sm text-muted">
-            {total} plot{total !== 1 ? "s" : ""} available
-          </p>
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold text-navy sm:text-3xl">Browse plots</h1>
+            <p className="mt-1 text-sm text-muted">
+              {total} plot{total !== 1 ? "s" : ""} available
+            </p>
+          </div>
+          <UnitConverterButton />
         </div>
 
         {loading ? (
