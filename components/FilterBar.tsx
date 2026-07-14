@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { cities, plotTypes } from "@/lib/data";
+import { getCityLandmark } from "@/lib/city-landmarks";
 
 export interface FilterValues {
   city: string;
@@ -58,7 +59,7 @@ function Controls({
           <option value="">All cities</option>
           {cities.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {getCityLandmark(c)} {c}
             </option>
           ))}
         </select>

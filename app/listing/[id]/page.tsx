@@ -7,10 +7,13 @@ import {
   Road,
   BadgeCheck,
   Phone,
+  Mail,
+  MessageCircle,
   ImageOff,
   ArrowLeft,
   ShieldCheck,
   FileCheck2,
+  ArrowRight,
 } from "lucide-react";
 import { formatPrice, formatArea, formatLocation } from "@/lib/data";
 import { getLiveListingById, getLiveListings } from "@/lib/listings-service";
@@ -18,8 +21,16 @@ import { DOCUMENT_BADGE_LABELS, type DocumentKey } from "@/lib/listing-form-data
 import { getLandRecordLabel } from "@/lib/land-records";
 import { getCurrentUserSavedPlotIds, recordListingView } from "@/lib/dashboard-service";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { deriveTrustBadges } from "@/lib/trust-badges";
 import PlotCard from "@/components/PlotCard";
 import SaveButton from "@/components/SaveButton";
+import CityLandmark from "@/components/CityLandmark";
+import TrustBadges from "@/components/TrustBadges";
+import UnitConverterButton from "@/components/UnitConverterModal";
+
+const KHALIPLOT_WHATSAPP = "919625763256";
+const KHALIPLOT_PHONE = "+919625763256";
+const KHALIPLOT_EMAIL = "hello@khaliplot.in";
 
 export const revalidate = 60;
 
@@ -90,14 +101,26 @@ export default async function ListingDetailPage({
 
   const photos = listing.photoUrls ?? [];
 
+  const trustBadges = deriveTrustBadges(listing);
+  const enquiryText = encodeURIComponent(
+    `Hi KhaliPlot, I'm interested in "${listing.title}" in ${formatLocation(
+      listing.locality,
+      listing.city
+    )} (listing ${listing.id}). Please connect me with the seller.`
+  );
+  const whatsappHref = `https://wa.me/${KHALIPLOT_WHATSAPP}?text=${enquiryText}`;
+  const emailHref = `mailto:${KHALIPLOT_EMAIL}?subject=${encodeURIComponent(
+    `Enquiry: ${listing.title}`
+  )}&body=${enquiryText}`;
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
       <Link
-        href="/search"
+        href="/browse"
         className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-green hover:text-navy"
       >
         <ArrowLeft size={16} />
-        Back to search
+        Back to browse
       </Link>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
@@ -156,7 +179,7 @@ export default async function ListingDetailPage({
                 {listing.title}
               </h1>
               <p className="mt-1 flex items-center gap-1.5 text-muted">
-                <MapPin size={15} />
+                <CityLandmark city={listing.city} label="" emojiSize={17} />
                 {formatLocation(listing.locality, listing.city, listing.state)}
               </p>
             </div>
@@ -173,9 +196,32 @@ export default async function ListingDetailPage({
             </div>
           </div>
 
+          {/* Trust & Verification */}
+          {trustBadges.length > 0 && (
+            <div className="mt-5 rounded-lg border border-line bg-white p-4">
+              <h2 className="flex items-center gap-2 font-display font-semibold text-navy">
+                <ShieldCheck size={18} className="text-india-green" />
+                Trust &amp; Verification
+              </h2>
+              <TrustBadges listing={listing} size="md" className="mt-3" />
+              <p className="mt-3 text-xs text-muted">
+                Based on the seller&apos;s declared documents — always verify independently.
+              </p>
+            </div>
+          )}
+
           <div className="plot-divider my-6" />
 
           {/* Key facts */}
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="coord-label text-navy/60">Plot details</h2>
+            <UnitConverterButton
+              label="Convert units"
+              initialUnit="sqft"
+              initialValue={String(listing.areaSqft)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-navy bg-white px-3 py-1.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-paper"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {keyFacts.map(({ label, value, icon: Icon }) => (
               <div key={label} className="rounded-lg border border-line bg-white p-4">
@@ -233,9 +279,22 @@ export default async function ListingDetailPage({
 
           {/* Location placeholder */}
           <div className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-navy">Location</h2>
-            <div className="plot-border mt-3 flex h-56 flex-col items-center justify-center gap-2 rounded-lg bg-green-pale text-green/40">
-              <MapPin size={28} strokeWidth={1.5} />
+            <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-navy">
+              <MapPin size={18} className="text-green" />
+              Location
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              <CityLandmark
+                city={listing.city}
+                emojiSize={18}
+                label={formatLocation(listing.locality, listing.city, listing.state)}
+              />
+            </p>
+            <div className="plot-border mt-3 flex h-56 flex-col items-center justify-center gap-2 rounded-lg bg-green-pale text-green/50">
+              <span aria-hidden="true" className="text-4xl">
+                {/* large city landmark */}
+                <CityLandmark city={listing.city} label="" emojiSize={40} />
+              </span>
               <span className="coord-label text-green/50">
                 {listing.coordinates.lat.toFixed(4)}° N, {listing.coordinates.lng.toFixed(4)}° E
               </span>
@@ -256,23 +315,41 @@ export default async function ListingDetailPage({
 
             <div className="plot-divider my-4" />
 
-            <p className="text-sm text-muted">Posted {listing.postedDaysAgo} day{listing.postedDaysAgo !== 1 ? "s" : ""} ago</p>
-            <p className="mt-3 flex items-center gap-2 font-display text-lg font-bold text-navy">
-              <Phone size={16} className="text-green" />
-              {listing.sellerPhone || "Contact hidden — reveal coming soon"}
+            <p className="text-sm text-muted">
+              Posted {listing.postedDaysAgo} day{listing.postedDaysAgo !== 1 ? "s" : ""} ago
             </p>
 
-            <div className="mt-5">
-              <button
-                disabled
-                className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md border border-line bg-paper-dim px-4 py-3 font-semibold text-muted"
+            {/* Contact — WhatsApp first (Indian buyers prefer it) */}
+            <div className="mt-4 space-y-2.5">
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-whatsapp px-4 py-3.5 font-display text-base font-bold text-white shadow-md transition-colors hover:bg-whatsapp-hover"
               >
-                🔒 Reveal contact — coming soon
-              </button>
+                <MessageCircle size={20} strokeWidth={2.25} />
+                Message on WhatsApp
+                <ArrowRight size={18} />
+              </a>
+              <a
+                href={`tel:${KHALIPLOT_PHONE}`}
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-amber px-4 py-2.5 font-semibold text-navy transition-colors hover:bg-amber-dark"
+              >
+                <Phone size={16} />
+                Call seller
+              </a>
+              <a
+                href={emailHref}
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-line bg-white px-4 py-2.5 text-sm font-semibold text-navy transition-colors hover:border-navy"
+              >
+                <Mail size={15} />
+                Send email
+              </a>
             </div>
 
             <p className="mt-4 text-center text-xs text-muted">
-              KhaliPlot connects you directly with the seller. No brokerage charged for browsing.
+              Enquiries route through the KhaliPlot team, who connect you with the seller. Your
+              number stays private and no brokerage is charged.
             </p>
           </div>
         </div>

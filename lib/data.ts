@@ -70,6 +70,7 @@ export const listings: Listing[] = [
     sellerPhone: "+91 98XXX XX234",
     coordinates: { lat: 18.7546, lng: 73.4062 },
     images: 6,
+    documents: { title_clear: true, rera_registered: true, land_record: true },
   },
   {
     id: "kp-lonavla-002",
@@ -420,6 +421,7 @@ export const listings: Listing[] = [
     sellerPhone: "+91 93XXX XX247",
     coordinates: { lat: 26.9115, lng: 75.7392 },
     images: 5,
+    documents: { title_clear: true, land_record: true },
   },
   {
     id: "kp-jaipur-002",

@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { MapPin, Compass, BadgeCheck, ImageOff } from "lucide-react";
+import { Compass, BadgeCheck, ImageOff } from "lucide-react";
 import { Listing, formatPrice, formatArea, formatLocation } from "@/lib/data";
 import SaveButton from "@/components/SaveButton";
+import CityLandmark from "@/components/CityLandmark";
+import TrustBadges from "@/components/TrustBadges";
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   live: "bg-green-pale text-green",
@@ -77,7 +79,7 @@ export default function PlotCard({
         </h3>
 
         <p className="flex items-center gap-1.5 text-sm text-muted">
-          <MapPin size={14} className="shrink-0" />
+          <CityLandmark city={listing.city} label="" emojiSize={15} className="shrink-0" />
           {formatLocation(listing.locality, listing.city)}
         </p>
 
@@ -98,6 +100,8 @@ export default function PlotCard({
           </span>
           <span className="text-xs text-muted">₹{listing.pricePerSqft.toLocaleString("en-IN")}/sqft</span>
         </div>
+
+        <TrustBadges listing={listing} max={3} className="mt-2" />
       </div>
     </Link>
   );
