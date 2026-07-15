@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { LogOut, Plus, Pencil, Trash2, X, Loader2, LayoutDashboard } from "lucide-react";
 import { plotTypes, cities, formatPrice, formatArea } from "@/lib/data";
 
 interface AdminListing {
@@ -237,6 +238,13 @@ export default function AdminDashboardClient() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Link
+            href="/admin"
+            className="flex items-center gap-1.5 rounded-md border border-line px-4 py-2 font-semibold text-navy hover:border-green-bright"
+          >
+            <LayoutDashboard size={16} />
+            Overview
+          </Link>
           <button
             onClick={openNewForm}
             className="flex items-center gap-1.5 rounded-md bg-amber px-4 py-2 font-semibold text-navy transition-colors hover:bg-navy hover:text-paper"

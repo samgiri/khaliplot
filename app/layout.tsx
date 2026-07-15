@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingChatbox from "@/components/FloatingChatbox";
 import Toaster from "@/components/Toaster";
+import HideOnAdmin from "@/components/HideOnAdmin";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const syne = Syne({
@@ -75,10 +76,14 @@ export default async function RootLayout({
       className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
-        <Header user={user} />
+        <HideOnAdmin>
+          <Header user={user} />
+        </HideOnAdmin>
         <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingChatbox />
+        <HideOnAdmin>
+          <Footer />
+          <FloatingChatbox />
+        </HideOnAdmin>
         <Toaster />
       </body>
     </html>
