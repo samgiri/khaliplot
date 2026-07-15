@@ -18,11 +18,17 @@ export default function ContactForm() {
   const [email, setEmail] = useState("");
   const [inquiryType, setInquiryType] = useState("buying");
   const [message, setMessage] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setErrorMessage("Please agree to the Terms & Conditions to continue.");
+      setStatus("error");
+      return;
+    }
     setStatus("loading");
     setErrorMessage("");
 
@@ -46,6 +52,7 @@ export default function ContactForm() {
       setEmail("");
       setInquiryType("buying");
       setMessage("");
+      setAgreed(false);
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
       setStatus("error");
@@ -173,6 +180,30 @@ export default function ContactForm() {
           </div>
         </div>
       )}
+
+      <div className="rounded-lg border border-amber bg-amber-light/40 p-3 text-xs text-navy">
+        ⚠️ Never send money to KhaliPlot. All plot payments go directly between buyer and seller.
+        Report fraud:{" "}
+        <a href="mailto:fraud@khaliplot.in" className="font-semibold underline">
+          fraud@khaliplot.in
+        </a>
+      </div>
+
+      <label className="flex items-start gap-2 text-sm text-ink/80">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-green"
+        />
+        <span>
+          I agree to the{" "}
+          <a href="/terms" className="font-semibold text-green hover:text-navy">
+            Terms &amp; Conditions
+          </a>
+          .
+        </span>
+      </label>
 
       <button
         type="submit"

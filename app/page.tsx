@@ -72,10 +72,17 @@ const plotAdvantages = [
 ];
 
 const pricingTeaser = [
-  { name: "Free", price: "₹0", note: "1 contact reveal / month" },
-  { name: "Plus", price: "from ₹999", note: "Unlimited reveals + verified badge", highlight: true },
-  { name: "Reveal Pack", price: "₹499", note: "10 reveals, valid 90 days" },
-  { name: "Booster", price: "₹499", note: "Pin your listing to the top for 7 days" },
+  { name: "Browse", price: "FREE", note: "Search, AI tools & save plots" },
+  { name: "Reveals", price: "₹499", note: "10 seller reveals, valid 90 days", highlight: true },
+  { name: "Plus", price: "from ₹999", note: "Unlimited reveals + verified badge" },
+  { name: "Commission", price: "₹0", note: "Nothing taken on the sale" },
+];
+
+const howItWorks = [
+  { step: "1", title: "Browse unlimited plots", note: "Free — search, filter and compare." },
+  { step: "2", title: "Reveal seller contact", note: "₹499 unlocks their WhatsApp." },
+  { step: "3", title: "Negotiate directly", note: "₹0 commission — talk owner to buyer." },
+  { step: "4", title: "Close the deal", note: "Both parties win." },
 ];
 
 function formatArticleDate(iso: string): string {
@@ -101,11 +108,11 @@ export default async function Home() {
               India First AI-Powered Land Marketplace
             </h1>
             <p className="mt-5 font-display text-lg font-semibold text-navy/70 sm:text-xl">
-              AI Price Suggestion • AI Score Based on Price
+              Browse Free. Pay ₹499 to Talk. ₹0 Commission.
             </p>
             <p className="mx-auto mt-4 max-w-lg text-lg text-ink/70">
               Browse verified residential, agricultural &amp; commercial plots directly from
-              owners. Zero brokerage. No spam calls. Pan India coverage.
+              owners. AI price suggestions. No spam calls. Pan India coverage.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
@@ -135,6 +142,29 @@ export default async function Home() {
           </div>
         </div>
         <div className="plot-divider-green" />
+      </section>
+
+      {/* How it works */}
+      <section className="bg-navy py-14 text-paper">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="mb-8 text-center">
+            <p className="coord-label text-green-bright">How it works</p>
+            <h2 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
+              Browse free. Pay ₹499 to talk. ₹0 commission.
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {howItWorks.map((s) => (
+              <div key={s.step} className="rounded-xl border border-paper/15 p-6">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber font-display text-lg font-bold text-navy">
+                  {s.step}
+                </span>
+                <h3 className="mt-4 font-display font-semibold text-paper">{s.title}</h3>
+                <p className="mt-1.5 text-sm text-paper/70">{s.note}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Browse by plot type */}
@@ -333,7 +363,7 @@ export default async function Home() {
         <div className="mb-8 text-center">
           <p className="coord-label text-green">Pricing</p>
           <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
-            Browse free. Pay only to talk to a seller.
+            Browse free. Pay ₹499 for contact. ₹0 on sale.
           </h2>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

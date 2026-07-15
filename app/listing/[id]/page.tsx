@@ -318,6 +318,9 @@ export default async function ListingDetailPage({
             <p className="text-sm text-muted">
               Posted {listing.postedDaysAgo} day{listing.postedDaysAgo !== 1 ? "s" : ""} ago
             </p>
+            <p className="mt-2 font-semibold text-navy">
+              Talk to the seller directly. No commission. Both win.
+            </p>
 
             {/* Contact — WhatsApp first (Indian buyers prefer it) */}
             <div className="mt-4 space-y-2.5">
@@ -347,7 +350,12 @@ export default async function ListingDetailPage({
               </a>
             </div>
 
-            <p className="mt-4 text-center text-xs text-muted">
+            <div className="mt-4 rounded-lg border border-green-bright bg-green-pale p-3 text-xs text-navy">
+              After you reveal contact, it&apos;s a direct deal between you and the seller —
+              KhaliPlot takes <span className="font-bold">₹0 commission</span> on the sale.
+            </div>
+
+            <p className="mt-3 text-center text-xs text-muted">
               Enquiries route through the KhaliPlot team, who connect you with the seller. Your
               number stays private and no brokerage is charged.
             </p>

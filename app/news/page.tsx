@@ -37,11 +37,11 @@ export default async function NewsPage({
       <div className="max-w-2xl">
         <p className="coord-label text-green">News &amp; insights</p>
         <h1 className="mt-2 font-display text-3xl font-bold text-navy sm:text-4xl">
-          Infrastructure news for India&apos;s plot markets
+          News, guides &amp; insights for plot buyers
         </h1>
         <p className="mt-3 text-ink/80">
-          Airports, expressways and industrial corridors — and what they mean for land
-          buyers, market by market.
+          Buyer tips, land-document explainers, market reports and the story behind our
+          ₹499 + ₹0 commission model.
         </p>
       </div>
 

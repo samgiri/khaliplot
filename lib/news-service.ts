@@ -34,10 +34,16 @@ function rowToArticle(row: NewsArticleRow): NewsArticle {
   };
 }
 
-/** Published articles, newest first. Empty array if Supabase isn't configured or the query fails. */
+/**
+ * Published articles, newest first. Falls back to the bundled launch articles
+ * (lib/news-seed) when Supabase isn't configured or the table is empty, so the
+ * News section is always populated.
+ */
 export async function getPublishedArticles(): Promise<NewsArticle[]> {
+  const { seedArticles } = await import("@/lib/news-seed");
+
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return [];
+    return seedArticles;
   }
 
   try {
@@ -47,19 +53,21 @@ export async function getPublishedArticles(): Promise<NewsArticle[]> {
       .eq("published", true)
       .order("created_at", { ascending: false });
 
-    if (error || !data) {
-      return [];
+    if (error || !data || data.length === 0) {
+      return seedArticles;
     }
 
     return (data as unknown as NewsArticleRow[]).map(rowToArticle);
   } catch {
-    return [];
+    return seedArticles;
   }
 }
 
 export async function getArticleBySlug(slug: string): Promise<NewsArticle | undefined> {
+  const { findSeedArticle } = await import("@/lib/news-seed");
+
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return undefined;
+    return findSeedArticle(slug);
   }
 
   try {
@@ -71,11 +79,11 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | unde
       .maybeSingle();
 
     if (error || !data) {
-      return undefined;
+      return findSeedArticle(slug);
     }
 
     return rowToArticle(data as unknown as NewsArticleRow);
   } catch {
-    return undefined;
+    return findSeedArticle(slug);
   }
 }

@@ -128,6 +128,20 @@ export default function BrowseClient({
       />
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+        {/* Info banner */}
+        <div className="mb-6 flex flex-col items-start justify-between gap-3 rounded-xl border border-line bg-green-pale p-4 sm:flex-row sm:items-center">
+          <p className="text-sm text-navy">
+            <span className="font-semibold">Browse free.</span> Ready to talk to a seller? Reveal
+            contact for <span className="font-semibold">₹499</span> — or go unlimited with Plus.
+          </p>
+          <a
+            href="/pricing"
+            className="shrink-0 rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy transition-colors hover:bg-amber-dark"
+          >
+            See pricing
+          </a>
+        </div>
+
         <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="font-display text-2xl font-bold text-navy sm:text-3xl">Browse plots</h1>
