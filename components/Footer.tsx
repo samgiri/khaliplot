@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, Clock } from "lucide-react";
 
 function InstagramIcon() {
   return (
@@ -139,7 +139,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#about" className="text-paper/80 hover:text-green-bright">
+                <Link href="/why-khaliplot" className="text-paper/80 hover:text-green-bright">
                   Why KhaliPlot
                 </Link>
               </li>
@@ -201,6 +201,10 @@ export default function Footer() {
                 <a href="tel:+919625763256" className="hover:text-green-bright">
                   +91 96257 63256
                 </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Clock size={16} className="shrink-0 text-green-bright" />
+                9 AM – 6 PM, Mon–Fri
               </li>
             </ul>
           </div>

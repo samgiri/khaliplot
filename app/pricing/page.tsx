@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Zap, ShieldCheck } from "lucide-react";
+import { Check, Zap, ShieldCheck, ArrowRight } from "lucide-react";
 
 export const metadata = {
   title: "Pricing | KhaliPlot.in",
@@ -44,27 +44,33 @@ export default function PricingPage() {
       <div className="mx-auto max-w-2xl text-center">
         <p className="coord-label text-green">Pricing</p>
         <h1 className="mt-2 font-display text-3xl font-bold text-navy sm:text-4xl">
-          Simple pricing, no hidden fees
+          Simple pricing. No hidden fees.
         </h1>
         <p className="mt-3 text-ink/80">
-          Browse every plot for free. Pay only when you want to talk directly to a seller.
+          Pay a small fee to get seller info. <span className="font-semibold text-navy">₹0 commission on the sale.</span>
         </p>
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
         {/* Free plan */}
         <div className="flex flex-col rounded-xl border-2 border-navy bg-white p-6 shadow-[6px_6px_0_0_var(--color-line)]">
-          <h2 className="font-display text-lg font-bold text-navy">FREE</h2>
-          <p className="mt-2 font-display text-3xl font-bold text-navy">₹0</p>
+          <h2 className="font-display text-lg font-bold text-navy">BROWSE</h2>
+          <p className="mt-2 font-display text-3xl font-bold text-navy">FREE</p>
           <ul className="mt-5 space-y-3 text-sm text-ink/80">
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Browse all plots
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Search unlimited plots
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> 1 contact reveal / month
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> See photos &amp; prices
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Post 2 listings
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> AI price suggestions
+            </li>
+            <li className="flex items-start gap-2">
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Unit converter
+            </li>
+            <li className="flex items-start gap-2">
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Save plots
             </li>
           </ul>
           <Link
@@ -123,17 +129,17 @@ export default function PricingPage() {
 
         {/* Reveal Pack (compact card) */}
         <div className="flex flex-col rounded-xl border-2 border-navy bg-white p-6 shadow-[6px_6px_0_0_var(--color-line)]">
-          <h2 className="font-display text-lg font-bold text-navy">REVEAL PACK</h2>
+          <h2 className="font-display text-lg font-bold text-navy">REVEALS</h2>
           <p className="mt-2 font-display text-3xl font-bold text-navy">₹499</p>
           <ul className="mt-5 space-y-3 text-sm text-ink/80">
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> 10 contact reveals
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> 10 reveals in 90 days
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Valid 90 days
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Get seller WhatsApp contact
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> No subscription
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> One-time, non-refundable
             </li>
           </ul>
           <Link
@@ -163,6 +169,45 @@ export default function PricingPage() {
           className="shrink-0 rounded-md bg-amber px-6 py-3 font-semibold text-navy transition-colors hover:bg-amber-dark"
         >
           Boost a listing
+        </Link>
+      </div>
+
+      {/* Commission? Zero. */}
+      <div className="mt-12 rounded-xl border-2 border-navy bg-green-pale p-6 text-center shadow-[6px_6px_0_0_var(--color-navy)] sm:p-10">
+        <h2 className="font-display text-2xl font-bold text-navy sm:text-3xl">Commission? Zero.</h2>
+        <p className="mx-auto mt-3 max-w-xl text-ink/80">
+          When you close the deal, KhaliPlot takes <span className="font-bold text-navy">₹0</span>.
+          The seller keeps 100%. The buyer saves the commission. Both parties win.
+        </p>
+        <div className="mx-auto mt-6 max-w-2xl overflow-x-auto">
+          <table className="w-full min-w-[420px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b-2 border-navy text-left">
+                <th className="py-2.5 pr-4 font-display text-navy">On a ₹50L plot</th>
+                <th className="py-2.5 px-4 text-right font-display text-navy">You pay</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-line">
+                <td className="py-2.5 pr-4 text-ink/75">Broker (8%)</td>
+                <td className="py-2.5 px-4 text-right font-semibold text-red">₹4,00,000</td>
+              </tr>
+              <tr className="border-b border-line">
+                <td className="py-2.5 pr-4 text-ink/75">Investor (3%)</td>
+                <td className="py-2.5 px-4 text-right font-semibold text-red">₹1,50,000</td>
+              </tr>
+              <tr className="border-b border-line bg-white">
+                <td className="py-2.5 pr-4 font-semibold text-navy">KhaliPlot</td>
+                <td className="py-2.5 px-4 text-right font-bold text-india-green">₹499</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <Link
+          href="/why-khaliplot"
+          className="mt-6 inline-flex items-center gap-1.5 font-semibold text-green hover:text-navy"
+        >
+          Why we charge ₹499, not commission <ArrowRight size={16} />
         </Link>
       </div>
     </div>
