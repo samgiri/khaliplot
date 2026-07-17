@@ -22,6 +22,11 @@ alter table inquiries
   add column inquiry_type text
     check (inquiry_type in ('buying', 'selling', 'listing', 'pricing', 'partnership', 'other'));
 
+-- ip_address: captured server-side on public contact-form submits for basic
+-- abuse tracking. Guarded so this file stays safe to re-run. Only ever set
+-- for source = 'contact_form' rows; buyer <-> seller inquiries leave it null.
+alter table inquiries add column if not exists ip_address text;
+
 -- No new RLS policy: contact-form inserts go through the server-side
 -- /api/contact route using the service role key (bypasses RLS), never a
 -- direct client insert. The existing buyer/seller policies are unaffected.

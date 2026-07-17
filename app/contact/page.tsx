@@ -86,6 +86,25 @@ const socialLinks = [
   },
 ];
 
+const contactFaqs = [
+  {
+    q: "How quickly will you get back to me?",
+    a: "We read every message that comes in and our team usually replies within a working day. For anything urgent, WhatsApp us on the number above for the fastest response.",
+  },
+  {
+    q: "Is my phone number private?",
+    a: "Yes. Your number is never shown publicly on any listing, and messages sent here go straight to our team — not to other users. We never sell your details to third parties.",
+  },
+  {
+    q: "Do you charge any commission on a sale?",
+    a: "No. KhaliPlot takes ₹0 commission on the sale itself. A small ₹499 fee only unlocks a seller's contact details — the full sale value stays between buyer and seller.",
+  },
+  {
+    q: "I have a question about listing my plot. Can you help?",
+    a: "Absolutely. Pick “Help with my listing” in the form above, or reach out on WhatsApp — we'll walk you through posting your plot for free.",
+  },
+];
+
 export default function ContactPage() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-14 sm:px-8 sm:py-20">
@@ -194,6 +213,34 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+
+      {/* FAQ */}
+      <section className="mt-14">
+        <p className="coord-label text-green">FAQ</p>
+        <h2 className="mt-2 font-display text-2xl font-bold text-navy sm:text-3xl">
+          Common questions
+        </h2>
+        <div className="mt-6 divide-y divide-line rounded-lg border border-line bg-white">
+          {contactFaqs.map((faq) => (
+            <details key={faq.q} className="group p-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-display font-semibold text-navy">
+                {faq.q}
+                <span className="shrink-0 text-green transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-sm text-ink/70">{faq.a}</p>
+            </details>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-muted">
+          More questions?{" "}
+          <a href="/faq" className="font-semibold text-green hover:text-navy">
+            See all FAQs
+          </a>
+          .
+        </p>
+      </section>
     </div>
   );
 }
