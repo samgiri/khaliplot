@@ -77,19 +77,22 @@ export default function AdminDashboardClient() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
 
-  async function loadListings() {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/admin/listings");
-      if (!res.ok) throw new Error("Failed to load listings");
-      const data = await res.json();
-      setListings(data.listings ?? []);
-    } catch {
-      setError("Could not load listings.");
-    } finally {
-      setLoading(false);
-    }
+  // Promise-chain style (not async/await) so every setState sits inside a
+  // callback rather than the function body — this keeps the mount effect clean
+  // under react-hooks/set-state-in-effect. Returns the promise so handlers can
+  // still `await loadListings()`. `loading` starts true for the initial load.
+  function loadListings() {
+    return fetch("/api/admin/listings")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load listings");
+        return res.json();
+      })
+      .then((data) => {
+        setListings(data.listings ?? []);
+        setError("");
+      })
+      .catch(() => setError("Could not load listings."))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {

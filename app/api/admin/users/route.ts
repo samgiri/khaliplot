@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, dbConfigured } from "@/lib/admin-api";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getUsersOverview } from "@/lib/admin-stats";
 
-// GET  /api/admin/users               — list/search/filter user profiles
+// GET  /api/admin/users               — dashboard aggregates + list/search/filter
 // PATCH /api/admin/users              — moderate a user (role / subscription_tier)
 //
 // Backed by the `profiles` table (schema_phase1_auth.sql + schema_part2_profiles.sql).
+//
+// The GET response is a superset: the aggregate fields the Users page charts
+// consume (activeUsers, signupTrend, roleBreakdown) plus the paginated `users`
+// list used by the moderation table.
 
 const USER_COLUMNS =
   "id, name, email, phone, role, location, state, city, subscription_tier, sub_expires_at, created_at";
@@ -33,8 +38,18 @@ export async function GET(request: NextRequest) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
+  // Aggregates are computed over ALL profiles (not the filtered/limited list),
+  // and getUsersOverview() handles the no-DB fallback on its own.
+  const overview = await getUsersOverview();
+  const aggregates = {
+    live: overview.live,
+    activeUsers: overview.activeUsers,
+    signupTrend: overview.signupTrend.map((p) => ({ date: p.date, count: p.value })),
+    roleBreakdown: Object.fromEntries(overview.roleBreakdown.map((r) => [r.role, r.count])),
+  };
+
   if (!dbConfigured()) {
-    return NextResponse.json({ live: false, users: [], total: 0 });
+    return NextResponse.json({ ...aggregates, users: [], total: 0 });
   }
 
   const params = request.nextUrl.searchParams;
@@ -66,7 +81,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ live: true, users: (data ?? []) as UserRow[], total: count ?? 0 });
+  return NextResponse.json({ ...aggregates, users: (data ?? []) as UserRow[], total: count ?? 0 });
 }
 
 // PATCH — update a user's role and/or subscription tier. Body: { id, role?, subscription_tier? }.

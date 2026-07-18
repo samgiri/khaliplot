@@ -72,6 +72,29 @@ function bucketByDay(timestamps: string[], weight = 1): DayPoint[] {
   return series;
 }
 
+export interface RoleCount {
+  role: string;
+  count: number;
+}
+
+export interface UsersOverview {
+  live: boolean; // true when backed by the real database
+  activeUsers: number; // total registered users (the schema has no last-active field)
+  signupTrend: DayPoint[]; // new profiles bucketed over the last 30 days
+  roleBreakdown: RoleCount[]; // count per profiles.role, largest first
+}
+
+function countByRole(rows: { role: string | null }[]): RoleCount[] {
+  const map = new Map<string, number>();
+  for (const r of rows) {
+    const role = r.role || "unknown";
+    map.set(role, (map.get(role) ?? 0) + 1);
+  }
+  return [...map.entries()]
+    .map(([role, count]) => ({ role, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
 function countByCity(rows: { city: string }[]): CityCount[] {
   const map = new Map<string, number>();
   for (const r of rows) {
@@ -179,5 +202,43 @@ export async function getAdminOverview(): Promise<AdminOverview> {
     };
   } catch {
     return seedOverview();
+  }
+}
+
+/** Fallback users overview from seed data — used when Supabase isn't configured. */
+function seedUsersOverview(): UsersOverview {
+  const uniqueSellers = new Set(seedListings.map((l) => l.sellerName)).size;
+  return {
+    live: false,
+    activeUsers: uniqueSellers,
+    signupTrend: lastNDays(30), // no signup dates in seed data — empty 30-day frame
+    roleBreakdown: [{ role: "seller", count: uniqueSellers }],
+  };
+}
+
+/**
+ * User-focused metrics for the admin Users page: total users, a 30-day signup
+ * trend and the role distribution. Backed by `profiles`; falls back to
+ * seed-derived figures (same policy as getAdminOverview) so the page always
+ * renders.
+ */
+export async function getUsersOverview(): Promise<UsersOverview> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return seedUsersOverview();
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin.from("profiles").select("role, created_at");
+    if (error) return seedUsersOverview();
+
+    const rows = (data ?? []) as { role: string | null; created_at: string }[];
+    return {
+      live: true,
+      activeUsers: rows.length,
+      signupTrend: bucketByDay(rows.map((r) => r.created_at)),
+      roleBreakdown: countByRole(rows),
+    };
+  } catch {
+    return seedUsersOverview();
   }
 }
