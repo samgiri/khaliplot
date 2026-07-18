@@ -66,7 +66,7 @@ export default function SearchPageClient({
         result = [...result].sort((a, b) => a.postedDaysAgo - b.postedDaysAgo);
     }
     return result;
-  }, [city, locality, type, budget, verifiedOnly, sort]);
+  }, [listings, city, locality, type, budget, verifiedOnly, sort]);
 
   const activeFilterCount = [city, locality, type, budget, verifiedOnly].filter(Boolean).length;
 
