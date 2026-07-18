@@ -24,7 +24,7 @@ export interface NavItem {
 // clearly-labelled "coming soon" placeholder for the next iteration.
 export const ADMIN_NAV: NavItem[] = [
   { key: "overview", label: "Overview", href: "/admin", icon: LayoutDashboard, live: true },
-  { key: "users", label: "Users", href: "/admin/users", icon: Users, live: false },
+  { key: "users", label: "Users", href: "/admin/users", icon: Users, live: true },
   { key: "listings", label: "Listings", href: "/admin/listings", icon: Building2, live: true },
   { key: "transactions", label: "Transactions", href: "/admin/transactions", icon: Wallet, live: false },
   { key: "disputes", label: "Disputes & Fraud", href: "/admin/disputes", icon: AlertTriangle, live: false },
@@ -36,11 +36,6 @@ export const ADMIN_NAV: NavItem[] = [
 ];
 
 export const PLACEHOLDER_SECTIONS: Record<string, { label: string; description: string }> = {
-  users: {
-    label: "Users Management",
-    description:
-      "List, search and moderate users — view profiles, transactions and listings, ban or message accounts. Coming next; the profiles data model is already in place.",
-  },
   transactions: {
     label: "Transactions & Reveals",
     description:
