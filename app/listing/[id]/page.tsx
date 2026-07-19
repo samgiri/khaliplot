@@ -24,6 +24,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { deriveTrustBadges } from "@/lib/trust-badges";
 import PlotCard from "@/components/PlotCard";
 import SaveButton from "@/components/SaveButton";
+import ReportListingButton from "@/components/ReportListingButton";
 import CityLandmark from "@/components/CityLandmark";
 import TrustBadges from "@/components/TrustBadges";
 import UnitConverterButton from "@/components/UnitConverterModal";
@@ -361,6 +362,11 @@ export default async function ListingDetailPage({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Report listing */}
+      <div className="mt-8 border-t border-line pt-6 text-center">
+        <ReportListingButton listingId={listing.id} />
       </div>
 
       {/* Similar listings */}

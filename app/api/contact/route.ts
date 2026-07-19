@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createContactInquiry } from "@/lib/inquiries-service";
+import { sendContactEmails } from "@/lib/email";
 
 // Best-effort in-memory limiter: resets whenever the serverless instance
 // recycles, but still blocks rapid resubmits within a warm instance.
@@ -50,6 +51,17 @@ export async function POST(request: NextRequest) {
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
+
+  // Best-effort auto-reply + team notification. sendContactEmails never throws
+  // and is a no-op without RESEND_API_KEY, so it can't affect the saved inquiry
+  // or the success response.
+  await sendContactEmails({
+    name: typeof body.name === "string" ? body.name.trim() : "",
+    email: typeof body.email === "string" ? body.email.trim() : "",
+    phone: typeof body.phone === "string" ? body.phone.trim() : "",
+    inquiryType: typeof body.inquiryType === "string" ? body.inquiryType : "other",
+    message: typeof body.message === "string" ? body.message.trim() : "",
+  });
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

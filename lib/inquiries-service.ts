@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { REPORT_REASONS, type ReportReason } from "@/lib/report-reasons";
 
 // Contact-form inquiry handling. The public /contact page and any other
 // anonymous "get in touch" entry point funnel through here so validation and
@@ -80,5 +81,75 @@ export async function createContactInquiry(
     return { ok: true };
   } catch {
     return { ok: false, error: "Couldn't save your message.", status: 500 };
+  }
+}
+
+export interface ListingReportInput {
+  plotId: unknown;
+  reason: unknown;
+  details?: unknown;
+  reporterEmail?: unknown;
+}
+
+/**
+ * Persist a "report this listing" flag. Stored in the same `inquiries` table as
+ * contact-form submissions (source = 'report_listing'), so no migration is
+ * needed and reports land in the admin Support inbox alongside other messages.
+ *
+ * `plot_id` is FK'd to a real listings row. Seed-only listings (not in the DB)
+ * would violate that FK, so on a foreign-key error we retry with a null plot_id
+ * and keep the reported id in the message text.
+ */
+export async function createListingReport(
+  input: ListingReportInput,
+  ipAddress: string
+): Promise<ContactInquiryResult> {
+  const plotId = typeof input.plotId === "string" ? input.plotId.trim() : "";
+  const reason = REPORT_REASONS.includes(input.reason as ReportReason)
+    ? (input.reason as ReportReason)
+    : "";
+  const details = typeof input.details === "string" ? input.details.trim() : "";
+  const reporterEmail = typeof input.reporterEmail === "string" ? input.reporterEmail.trim() : "";
+
+  if (!plotId) {
+    return { ok: false, error: "Missing listing reference.", status: 400 };
+  }
+  if (!reason) {
+    return { ok: false, error: "Please choose a reason for the report.", status: 400 };
+  }
+  if (details.length > 2000) {
+    return { ok: false, error: "Please shorten the details.", status: 400 };
+  }
+  if (reporterEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reporterEmail)) {
+    return { ok: false, error: "Please enter a valid email.", status: 400 };
+  }
+
+  const message = `Report reason: ${reason}${details ? `\n\n${details}` : ""}`;
+  const baseRow = {
+    source: "report_listing",
+    inquiry_type: "other" as const,
+    email: reporterEmail || null,
+    ip_address: ipAddress || null,
+  };
+
+  try {
+    const first = await supabaseAdmin
+      .from("inquiries")
+      .insert({ ...baseRow, plot_id: plotId, message });
+    if (!first.error) return { ok: true };
+
+    // 23503 = foreign_key_violation → the plot isn't a DB row (seed listing).
+    if (first.error.code === "23503") {
+      const retry = await supabaseAdmin.from("inquiries").insert({
+        ...baseRow,
+        plot_id: null,
+        message: `Reported listing: ${plotId}\n${message}`,
+      });
+      if (!retry.error) return { ok: true };
+    }
+
+    return { ok: false, error: "Couldn't submit your report.", status: 500 };
+  } catch {
+    return { ok: false, error: "Couldn't submit your report.", status: 500 };
   }
 }
