@@ -5,10 +5,17 @@ import { Loader2 } from "lucide-react";
 import PlotCard from "@/components/PlotCard";
 import FilterBar, { EMPTY_FILTERS, type FilterValues } from "@/components/FilterBar";
 import UnitConverterButton from "@/components/UnitConverterModal";
-import type { BrowsePage } from "@/lib/browse-service";
+import type { BrowsePage, SortOption } from "@/lib/browse-service";
 import type { Listing } from "@/lib/data";
 
-function buildQuery(f: FilterValues, page: number): string {
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: "newest", label: "Newest first" },
+  { value: "price-low", label: "Price: Low to High" },
+  { value: "price-high", label: "Price: High to Low" },
+  { value: "area-large", label: "Area: Largest first" },
+];
+
+function buildQuery(f: FilterValues, page: number, sort: SortOption): string {
   const p = new URLSearchParams();
   if (f.city) p.set("city", f.city);
   if (f.plotType) p.set("type", f.plotType);
@@ -16,6 +23,7 @@ function buildQuery(f: FilterValues, page: number): string {
   if (f.maxPrice) p.set("maxPrice", f.maxPrice);
   if (f.minArea) p.set("minArea", f.minArea);
   if (f.maxArea) p.set("maxArea", f.maxArea);
+  if (sort !== "newest") p.set("sort", sort);
   if (page > 1) p.set("page", String(page));
   return p.toString();
 }
@@ -42,10 +50,12 @@ export default function BrowseClient({
   initialPage,
   savedPlotIds,
   initialValues,
+  initialSort,
 }: {
   initialPage: BrowsePage;
   savedPlotIds: string[];
   initialValues: FilterValues;
+  initialSort: SortOption;
 }) {
   const savedSet = useMemo(() => new Set(savedPlotIds), [savedPlotIds]);
 
@@ -53,6 +63,7 @@ export default function BrowseClient({
   // reflect (also what Load More pages through).
   const [draft, setDraft] = useState<FilterValues>(initialValues);
   const [applied, setApplied] = useState<FilterValues>(initialValues);
+  const [sort, setSort] = useState<SortOption>(initialSort);
 
   const [listings, setListings] = useState<Listing[]>(initialPage.listings);
   const [total, setTotal] = useState(initialPage.total);
@@ -66,9 +77,9 @@ export default function BrowseClient({
     setDraft((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function fetchFirstPage(filters: FilterValues) {
+  async function fetchFirstPage(filters: FilterValues, sortValue: SortOption) {
     setLoading(true);
-    const qs = buildQuery(filters, 1);
+    const qs = buildQuery(filters, 1, sortValue);
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `/browse${qs ? `?${qs}` : ""}`);
     }
@@ -88,20 +99,25 @@ export default function BrowseClient({
 
   function applyFilters() {
     setApplied(draft);
-    fetchFirstPage(draft);
+    fetchFirstPage(draft, sort);
   }
 
   function clearFilters() {
     setDraft(EMPTY_FILTERS);
     setApplied(EMPTY_FILTERS);
-    fetchFirstPage(EMPTY_FILTERS);
+    fetchFirstPage(EMPTY_FILTERS, sort); // clearing filters keeps the chosen sort
+  }
+
+  function changeSort(next: SortOption) {
+    setSort(next);
+    fetchFirstPage(applied, next); // re-sort the applied result set from page 1
   }
 
   async function loadMore() {
     const next = page + 1;
     setLoadingMore(true);
     try {
-      const res = await fetch(`/api/browse?${buildQuery(applied, next)}`);
+      const res = await fetch(`/api/browse?${buildQuery(applied, next, sort)}`);
       const data: BrowsePage = await res.json();
       setListings((prev) => [...prev, ...data.listings]);
       setHasMore(data.hasMore);
@@ -149,7 +165,27 @@ export default function BrowseClient({
               {total} plot{total !== 1 ? "s" : ""} available
             </p>
           </div>
-          <UnitConverterButton />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label htmlFor="browse-sort" className="coord-label shrink-0 text-navy/60">
+                Sort
+              </label>
+              <select
+                id="browse-sort"
+                value={sort}
+                onChange={(e) => changeSort(e.target.value as SortOption)}
+                disabled={loading}
+                className="rounded-md border border-line bg-white px-3 py-2 text-sm text-ink focus:border-green-bright disabled:opacity-60"
+              >
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <UnitConverterButton />
+          </div>
         </div>
 
         {loading ? (

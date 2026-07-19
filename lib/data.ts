@@ -617,13 +617,24 @@ export const cities = [
   "Goa",
 ] as const;
 
-export const plotTypes: PlotType[] = [
-  "Residential",
-  "Agricultural",
-  "Commercial",
-  "Farmhouse",
-  "Industrial",
-];
+// Selectable plot types across the site (filters, forms). Commercial and
+// Industrial were retired — see REMOVED_PLOT_TYPES.
+export const plotTypes: PlotType[] = ["Residential", "Agricultural", "Farmhouse"];
+
+/**
+ * Plot types retired from the site. The PlotType union still lists them so
+ * pre-existing rows and seed data type-check, but they're filtered out of every
+ * public listing query and are no longer selectable when posting a plot.
+ */
+export const REMOVED_PLOT_TYPES: PlotType[] = ["Commercial", "Industrial"];
+
+/** True when a plot type is still offered (i.e. not Commercial/Industrial). */
+export function isActivePlotType(plotType: PlotType): boolean {
+  return !REMOVED_PLOT_TYPES.includes(plotType);
+}
+
+/** PostgREST value list for `.not("plot_type", "in", …)` filters. */
+export const REMOVED_PLOT_TYPES_PG = `(${REMOVED_PLOT_TYPES.join(",")})`;
 
 export function formatPrice(priceLakh: number): string {
   if (priceLakh >= 100) {

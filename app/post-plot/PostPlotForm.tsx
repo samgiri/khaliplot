@@ -6,9 +6,7 @@ import {
   MapPin,
   Home as HomeIcon,
   Tractor,
-  Building2,
   TreePine,
-  Factory,
   Sparkles,
   ImagePlus,
   X,
@@ -36,9 +34,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 const plotTypeIcons: Record<string, typeof HomeIcon> = {
   Residential: HomeIcon,
   Agricultural: Tractor,
-  Commercial: Building2,
   Farmhouse: TreePine,
-  Industrial: Factory,
 };
 
 const MAX_PHOTOS = 8;
