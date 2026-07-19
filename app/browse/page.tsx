@@ -1,6 +1,11 @@
 import BrowseClient from "./BrowseClient";
 import type { FilterValues } from "@/components/FilterBar";
-import { BROWSE_PAGE_SIZE, getBrowsePage, parseBrowseFilters } from "@/lib/browse-service";
+import {
+  BROWSE_PAGE_SIZE,
+  getBrowsePage,
+  parseBrowseFilters,
+  parseBrowseSort,
+} from "@/lib/browse-service";
 import { getCurrentUserSavedPlotIds } from "@/lib/dashboard-service";
 
 export const revalidate = 60;
@@ -17,9 +22,10 @@ export default async function BrowsePage({
 }) {
   const params = await searchParams;
   const filters = parseBrowseFilters(params);
+  const sort = parseBrowseSort(params);
 
   const [first, savedPlotIds] = await Promise.all([
-    getBrowsePage(filters, 1, BROWSE_PAGE_SIZE),
+    getBrowsePage(filters, 1, BROWSE_PAGE_SIZE, sort),
     getCurrentUserSavedPlotIds(),
   ]);
 
@@ -37,6 +43,7 @@ export default async function BrowsePage({
       initialPage={first}
       savedPlotIds={[...savedPlotIds]}
       initialValues={initialValues}
+      initialSort={sort}
     />
   );
 }
