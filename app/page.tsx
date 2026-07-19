@@ -109,7 +109,7 @@ export default async function Home() {
               Browse Free. Pay ₹499 to Talk. ₹0 Commission.
             </p>
             <p className="mx-auto mt-4 max-w-lg text-lg text-ink/70">
-              Browse verified residential, agricultural &amp; commercial plots directly from
+              Browse verified residential, agricultural &amp; farmhouse plots directly from
               owners. AI price suggestions. No spam calls. Pan India coverage.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -181,20 +181,22 @@ export default async function Home() {
             View all <ArrowRight size={16} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {plotCategories.map(({ type, icon: Icon, description }) => (
             <Link
               key={type}
               href={`/search?type=${type}`}
-              className="plot-border plot-border-hover group flex flex-col gap-3 rounded-lg bg-white p-5 transition-shadow hover:shadow-md"
+              className="plot-border plot-border-hover group flex min-h-[13rem] flex-col rounded-xl bg-white p-6 transition-shadow hover:shadow-md sm:min-h-[15rem] sm:p-8"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-md bg-green-pale text-green group-hover:bg-green group-hover:text-paper">
-                <Icon size={22} />
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-green-pale text-green transition-colors group-hover:bg-green group-hover:text-paper sm:h-16 sm:w-16">
+                <Icon size={30} />
               </div>
-              <div>
-                <h3 className="font-display font-semibold text-navy">{type}</h3>
-                <p className="mt-1 text-sm text-muted">{description}</p>
-              </div>
+              <h3 className="mt-5 font-display text-xl font-bold text-navy sm:text-2xl">{type}</h3>
+              <p className="mt-2 text-sm text-ink/70 sm:text-base">{description}</p>
+              <span className="mt-auto flex items-center gap-1.5 pt-5 text-sm font-semibold text-green transition-colors group-hover:text-navy">
+                Browse {type.toLowerCase()} plots
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              </span>
             </Link>
           ))}
         </div>
