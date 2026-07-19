@@ -1,6 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { Listing, PlotType, listings as seedListings } from "@/lib/data";
+import {
+  Listing,
+  PlotType,
+  listings as seedListings,
+  isActivePlotType,
+  REMOVED_PLOT_TYPES_PG,
+} from "@/lib/data";
+
+/** Seed listings with retired plot types (Commercial/Industrial) removed. */
+const activeSeedListings = seedListings.filter((l) => isActivePlotType(l.plotType));
 import type { ListingDocuments } from "@/lib/listing-form-data";
 
 // Columns safe to expose publicly. seller_phone is deliberately excluded —
@@ -111,7 +120,7 @@ export function rowToListing(row: ListingRow): Listing {
  */
 export async function getLiveListings(): Promise<Listing[]> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return seedListings;
+    return activeSeedListings;
   }
 
   try {
@@ -119,15 +128,16 @@ export async function getLiveListings(): Promise<Listing[]> {
       .from("listings")
       .select(PUBLIC_LISTING_COLUMNS)
       .eq("status", "live")
+      .not("plot_type", "in", REMOVED_PLOT_TYPES_PG)
       .order("created_at", { ascending: false });
 
     if (error || !data || data.length === 0) {
-      return seedListings;
+      return activeSeedListings;
     }
 
     return (data as unknown as ListingRow[]).map(rowToListing);
   } catch {
-    return seedListings;
+    return activeSeedListings;
   }
 }
 
@@ -137,7 +147,7 @@ export async function getLiveListings(): Promise<Listing[]> {
  */
 export async function getLiveListingById(id: string): Promise<Listing | undefined> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return seedListings.find((l) => l.id === id);
+    return activeSeedListings.find((l) => l.id === id);
   }
 
   try {
@@ -146,15 +156,16 @@ export async function getLiveListingById(id: string): Promise<Listing | undefine
       .select(PUBLIC_LISTING_COLUMNS)
       .eq("id", id)
       .eq("status", "live")
+      .not("plot_type", "in", REMOVED_PLOT_TYPES_PG)
       .maybeSingle();
 
     if (error || !data) {
-      return seedListings.find((l) => l.id === id);
+      return activeSeedListings.find((l) => l.id === id);
     }
 
     return rowToListing(data as unknown as ListingRow);
   } catch {
-    return seedListings.find((l) => l.id === id);
+    return activeSeedListings.find((l) => l.id === id);
   }
 }
 
@@ -171,11 +182,15 @@ export async function getListingsByIds(ids: string[]): Promise<Listing[]> {
   if (ids.length === 0) return [];
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return seedListings.filter((l) => ids.includes(l.id));
+    return activeSeedListings.filter((l) => ids.includes(l.id));
   }
 
   try {
-    const { data, error } = await supabase.from("listings").select(PUBLIC_LISTING_COLUMNS).in("id", ids);
+    const { data, error } = await supabase
+      .from("listings")
+      .select(PUBLIC_LISTING_COLUMNS)
+      .in("id", ids)
+      .not("plot_type", "in", REMOVED_PLOT_TYPES_PG);
     if (error || !data) return [];
     return (data as unknown as ListingRow[]).map(rowToListing);
   } catch {

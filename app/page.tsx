@@ -32,9 +32,7 @@ import { getCurrentUserSavedPlotIds } from "@/lib/dashboard-service";
 const plotCategories = [
   { type: "Residential", icon: HomeIcon, description: "NA plots ready for homes" },
   { type: "Agricultural", icon: Tractor, description: "Farmland & orchards" },
-  { type: "Commercial", icon: Building2, description: "Shops, offices & showrooms" },
   { type: "Farmhouse", icon: TreePine, description: "Weekend retreats & estates" },
-  { type: "Industrial", icon: Factory, description: "Warehousing & factory land" },
 ];
 
 const trustStrip = [

@@ -1,5 +1,10 @@
 import { supabase } from "@/lib/supabase";
-import { Listing, listings as seedListings } from "@/lib/data";
+import {
+  Listing,
+  listings as seedListings,
+  isActivePlotType,
+  REMOVED_PLOT_TYPES_PG,
+} from "@/lib/data";
 import {
   PUBLIC_LISTING_COLUMNS,
   rowToListing,
@@ -104,6 +109,7 @@ export function parseBrowseSort(
 function applyFiltersToSeed(list: Listing[], f: BrowseFilters, sort: SortOption): Listing[] {
   return list
     .filter((l) => {
+      if (!isActivePlotType(l.plotType)) return false; // hide retired types
       if (f.city && l.city !== f.city) return false;
       if (f.plotType && l.plotType !== f.plotType) return false;
       if (f.minPrice != null && l.priceLakh < f.minPrice) return false;
@@ -157,7 +163,8 @@ export async function getBrowsePage(
     let query = supabase
       .from("listings")
       .select(PUBLIC_LISTING_COLUMNS, { count: "exact" })
-      .eq("status", "live");
+      .eq("status", "live")
+      .not("plot_type", "in", REMOVED_PLOT_TYPES_PG);
 
     if (filters.city) query = query.eq("city", filters.city);
     if (filters.plotType) query = query.eq("plot_type", filters.plotType);
