@@ -66,6 +66,10 @@ export async function createContactInquiry(
   try {
     const { error } = await supabaseAdmin.from("inquiries").insert({
       source: "contact_form",
+      // `channel` is NOT NULL with no default (schema_phase1_auth.sql) and the
+      // Part 1 migration never relaxed it, so contact-form rows must set it — a
+      // website form submission maps to the 'website' channel.
+      channel: "website",
       name,
       phone: phone || null,
       email: email || null,
@@ -127,6 +131,7 @@ export async function createListingReport(
   const message = `Report reason: ${reason}${details ? `\n\n${details}` : ""}`;
   const baseRow = {
     source: "report_listing",
+    channel: "website", // NOT NULL column — see createContactInquiry
     inquiry_type: "other" as const,
     email: reporterEmail || null,
     ip_address: ipAddress || null,
