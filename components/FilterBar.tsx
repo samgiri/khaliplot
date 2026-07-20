@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { Loader2, SlidersHorizontal, X } from "lucide-react";
 import { cities, plotTypes } from "@/lib/data";
 import { getCityLandmark } from "@/lib/city-landmarks";
 
@@ -39,11 +39,16 @@ function Controls({
   values,
   onChange,
   idPrefix,
+  stacked = false,
 }: {
   values: FilterValues;
   onChange: FilterBarProps["onChange"];
   idPrefix: string;
+  // Stacks each Min/Max pair vertically — used in the mobile drawer, where the
+  // panel is capped at max-w-sm and two number inputs side by side get cramped.
+  stacked?: boolean;
 }) {
+  const rangeRowClass = stacked ? "flex flex-col gap-2" : "flex items-center gap-2";
   return (
     <>
       <div className="flex flex-col gap-1.5">
@@ -86,24 +91,24 @@ function Controls({
 
       <div className="flex flex-col gap-1.5">
         <span className="coord-label text-navy/60">Budget (₹ Lakh)</span>
-        <div className="flex items-center gap-2">
+        <div className={rangeRowClass}>
           <input
             type="number"
             min={0}
             inputMode="numeric"
             aria-label="Minimum budget in lakh"
-            placeholder="Min"
+            placeholder="e.g. 20"
             value={values.minPrice}
             onChange={(e) => onChange("minPrice", e.target.value)}
             className="w-full rounded-md border border-line bg-white px-2.5 py-2 text-sm focus:border-green-bright"
           />
-          <span className="text-muted">–</span>
+          {!stacked && <span className="text-muted">–</span>}
           <input
             type="number"
             min={0}
             inputMode="numeric"
             aria-label="Maximum budget in lakh"
-            placeholder="Max"
+            placeholder="e.g. 80"
             value={values.maxPrice}
             onChange={(e) => onChange("maxPrice", e.target.value)}
             className="w-full rounded-md border border-line bg-white px-2.5 py-2 text-sm focus:border-green-bright"
@@ -113,24 +118,24 @@ function Controls({
 
       <div className="flex flex-col gap-1.5">
         <span className="coord-label text-navy/60">Area (sqft)</span>
-        <div className="flex items-center gap-2">
+        <div className={rangeRowClass}>
           <input
             type="number"
             min={0}
             inputMode="numeric"
             aria-label="Minimum area in sqft"
-            placeholder="Min"
+            placeholder="e.g. 1000"
             value={values.minArea}
             onChange={(e) => onChange("minArea", e.target.value)}
             className="w-full rounded-md border border-line bg-white px-2.5 py-2 text-sm focus:border-green-bright"
           />
-          <span className="text-muted">–</span>
+          {!stacked && <span className="text-muted">–</span>}
           <input
             type="number"
             min={0}
             inputMode="numeric"
             aria-label="Maximum area in sqft"
-            placeholder="Max"
+            placeholder="e.g. 5000"
             value={values.maxArea}
             onChange={(e) => onChange("maxArea", e.target.value)}
             className="w-full rounded-md border border-line bg-white px-2.5 py-2 text-sm focus:border-green-bright"
@@ -163,9 +168,16 @@ export default function FilterBar({
           <button
             onClick={onApply}
             disabled={loading}
-            className="rounded-md bg-amber px-5 py-2 font-display font-bold text-navy transition-colors hover:bg-amber-dark disabled:opacity-60"
+            className="flex items-center justify-center gap-2 rounded-md bg-amber px-5 py-2 font-display font-bold text-navy transition-colors hover:bg-amber-dark disabled:opacity-60"
           >
-            Apply
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Applying…
+              </>
+            ) : (
+              "Apply"
+            )}
           </button>
           <button
             onClick={onClear}
@@ -180,12 +192,22 @@ export default function FilterBar({
         <div className="flex items-center justify-between lg:hidden">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-2 rounded-md border border-line bg-white px-4 py-2 font-semibold text-navy"
+            disabled={loading}
+            className="flex items-center gap-2 rounded-md border border-line bg-white px-4 py-2 font-semibold text-navy disabled:opacity-60"
           >
-            <SlidersHorizontal size={16} />
-            Filters
-            {activeCount > 0 && (
-              <span className="rounded-full bg-green px-2 py-0.5 text-xs text-paper">{activeCount}</span>
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Applying…
+              </>
+            ) : (
+              <>
+                <SlidersHorizontal size={16} />
+                Filters
+                {activeCount > 0 && (
+                  <span className="rounded-full bg-green px-2 py-0.5 text-xs text-paper">{activeCount}</span>
+                )}
+              </>
             )}
           </button>
           <p className="text-sm text-muted">
@@ -210,7 +232,7 @@ export default function FilterBar({
               </button>
             </div>
             <div className="flex flex-col gap-4">
-              <Controls values={values} onChange={onChange} idPrefix="m" />
+              <Controls values={values} onChange={onChange} idPrefix="m" stacked />
             </div>
             <div className="mt-6 flex flex-col gap-2">
               <button
@@ -219,9 +241,16 @@ export default function FilterBar({
                   setDrawerOpen(false);
                 }}
                 disabled={loading}
-                className="w-full rounded-md bg-amber py-2.5 font-display font-bold text-navy transition-colors hover:bg-amber-dark disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-amber py-2.5 font-display font-bold text-navy transition-colors hover:bg-amber-dark disabled:opacity-60"
               >
-                Show {resultCount} plot{resultCount !== 1 ? "s" : ""}
+                {loading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Applying…
+                  </>
+                ) : (
+                  `Show ${resultCount} plot${resultCount !== 1 ? "s" : ""}`
+                )}
               </button>
               <button
                 onClick={onClear}
