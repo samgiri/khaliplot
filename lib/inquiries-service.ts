@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAdmin, isSupabaseAdminConfigured } from "@/lib/supabase-admin";
 import { REPORT_REASONS, type ReportReason } from "@/lib/report-reasons";
 
 // Contact-form inquiry handling. The public /contact page and any other
@@ -63,6 +63,21 @@ export async function createContactInquiry(
     return { ok: false, error: "Please enter a valid phone number.", status: 400 };
   }
 
+  // Missing service-role env vars is a deployment/config problem, not the
+  // visitor's fault — surface it distinctly (and loudly in the logs) so it's
+  // obvious in Vercel that SUPABASE_SERVICE_ROLE_KEY / NEXT_PUBLIC_SUPABASE_URL
+  // aren't set, rather than hiding behind a generic "couldn't save" message.
+  if (!isSupabaseAdminConfigured()) {
+    console.error(
+      "[contact] Supabase admin not configured — set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+    );
+    return {
+      ok: false,
+      error: "We're unable to receive messages right now. Please WhatsApp or email us instead.",
+      status: 503,
+    };
+  }
+
   try {
     const { error } = await supabaseAdmin.from("inquiries").insert({
       source: "contact_form",
@@ -79,11 +94,22 @@ export async function createContactInquiry(
     });
 
     if (error) {
+      // Log the real Postgres/PostgREST error so the cause is visible in the
+      // server logs. A NOT NULL violation on buyer_id/seller_id/plot_id or a
+      // "column ... does not exist" here means schema_part1_contact_form.sql
+      // hasn't been applied to this database yet.
+      console.error("[contact] insert into inquiries failed:", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
       return { ok: false, error: "Couldn't save your message.", status: 500 };
     }
 
     return { ok: true };
-  } catch {
+  } catch (err) {
+    console.error("[contact] unexpected error saving inquiry:", err);
     return { ok: false, error: "Couldn't save your message.", status: 500 };
   }
 }

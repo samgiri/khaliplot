@@ -8,6 +8,18 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 // work even if the env vars aren't set (e.g. local builds without a .env).
 let client: SupabaseClient | null = null;
 
+/**
+ * True when both env vars the admin client needs are present. Lets callers
+ * (e.g. the contact form) return a clear "server not configured" error and log
+ * it, instead of a generic failure, when SUPABASE_SERVICE_ROLE_KEY is missing
+ * in the deployment environment.
+ */
+export function isSupabaseAdminConfigured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
+
 export const supabaseAdmin = {
   from(table: string) {
     if (!client) {
