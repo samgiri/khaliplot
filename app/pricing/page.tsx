@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { Check, Zap, ShieldCheck, ArrowRight } from "lucide-react";
+import { Check, Zap, ArrowRight } from "lucide-react";
+import TrustBadge from "@/components/pricing/TrustBadge";
+import { getFounding100SpotsLeft } from "@/lib/founding-100";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Pricing | KhaliPlot.in",
@@ -33,12 +37,20 @@ const plusDurations = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const spotsLeft = await getFounding100SpotsLeft();
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
       {/* Founding ribbon */}
-      <div className="mb-8 flex items-center justify-center rounded-full bg-amber px-4 py-2 text-center text-sm font-semibold text-navy">
-        🏆 Founding 100 — first 100 members get 50% OFF everything
+      <div className="mb-8 flex items-center justify-center rounded-full bg-amber px-4 py-2 text-center font-display text-sm font-bold text-navy">
+        {spotsLeft > 0 ? (
+          <>
+            🏆 Founding 100 — only {spotsLeft} spot{spotsLeft === 1 ? "" : "s"} left, 50% off everything
+          </>
+        ) : (
+          <>🏆 Founding 100 is full — thank you for the early trust</>
+        )}
       </div>
 
       <div className="mx-auto max-w-2xl text-center">
@@ -47,7 +59,8 @@ export default function PricingPage() {
           Simple pricing. No hidden fees.
         </h1>
         <p className="mt-3 text-ink/80">
-          Pay a small fee to get seller info. <span className="font-semibold text-navy">₹0 commission on the sale.</span>
+          Pay a small fee to see the seller&apos;s number.{" "}
+          <span className="font-semibold text-navy">When the deal closes, we take ₹0.</span>
         </p>
       </div>
 
@@ -58,19 +71,19 @@ export default function PricingPage() {
           <p className="mt-2 font-display text-3xl font-bold text-navy">FREE</p>
           <ul className="mt-5 space-y-3 text-sm text-ink/80">
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Search unlimited plots
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Look at as many plots as you want
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> See photos &amp; prices
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> See photos and prices
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> AI price suggestions
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Check if a price is fair
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Unit converter
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Convert land units easily
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Save plots
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Save plots you like
             </li>
           </ul>
           <Link
@@ -84,7 +97,9 @@ export default function PricingPage() {
         {/* Plus plan with duration toggle */}
         <div className="relative flex flex-col rounded-xl border-2 border-navy bg-white p-6 shadow-[6px_6px_0_0_var(--color-amber)] lg:-mt-4 lg:mb-4">
           <h2 className="font-display text-lg font-bold text-navy">PLUS</h2>
-          <p className="mt-1 text-sm text-muted">Unlimited reveals · 10 listings · verified badge · priority in search</p>
+          <p className="mt-1 text-sm text-muted">
+            See every seller&apos;s number · List up to 10 plots · Verified badge · Show up first in search
+          </p>
 
           <div className="mt-5 space-y-4">
             {plusDurations.map((d) => (
@@ -110,14 +125,10 @@ export default function PricingPage() {
                     )}
                   </div>
                 </div>
+                <TrustBadge />
               </div>
             ))}
           </div>
-
-          <p className="mt-4 rounded-lg bg-green-pale p-3 text-xs text-green">
-            <ShieldCheck size={14} className="mr-1 inline align-text-bottom" />
-            Trust Guarantee: no genuine response in 90 days? We extend your plan free.
-          </p>
 
           <Link
             href="/login"
@@ -133,20 +144,20 @@ export default function PricingPage() {
           <p className="mt-2 font-display text-3xl font-bold text-navy">₹499</p>
           <ul className="mt-5 space-y-3 text-sm text-ink/80">
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> 10 reveals in 90 days
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> 10 seller numbers, valid 90 days
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Get seller WhatsApp contact
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Get the seller&apos;s WhatsApp number
             </li>
             <li className="flex items-start gap-2">
-              <Check size={16} className="mt-0.5 shrink-0 text-green" /> One-time, non-refundable
+              <Check size={16} className="mt-0.5 shrink-0 text-green" /> Pay once, no refunds
             </li>
           </ul>
           <Link
             href="/login"
             className="mt-6 rounded-md border-2 border-navy px-6 py-3 text-center font-semibold text-navy transition-colors hover:bg-navy hover:text-paper"
           >
-            Get Reveal Pack
+            Buy Reveal Pack
           </Link>
         </div>
       </div>
@@ -160,7 +171,7 @@ export default function PricingPage() {
           <div>
             <h3 className="font-display text-lg font-bold">BOOSTER — ₹499 / 7 days</h3>
             <p className="mt-1 text-sm text-paper/70">
-              Pin your listing to the top + Featured tag. Works with any package.
+              Put your plot at the top of search for 7 days. Works with any plan.
             </p>
           </div>
         </div>
@@ -177,7 +188,7 @@ export default function PricingPage() {
         <h2 className="font-display text-2xl font-bold text-navy sm:text-3xl">Commission? Zero.</h2>
         <p className="mx-auto mt-3 max-w-xl text-ink/80">
           When you close the deal, KhaliPlot takes <span className="font-bold text-navy">₹0</span>.
-          The seller keeps 100%. The buyer saves the commission. Both parties win.
+          The seller keeps every rupee. The buyer saves the commission.
         </p>
         <div className="mx-auto mt-6 max-w-2xl overflow-x-auto">
           <table className="w-full min-w-[420px] border-collapse text-sm">
