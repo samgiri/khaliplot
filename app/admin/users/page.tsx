@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Users, UserPlus, PieChart } from "lucide-react";
+import { Users, UserPlus, PieChart, Trophy } from "lucide-react";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { getUsersOverview } from "@/lib/admin-stats";
 import AdminShell from "@/components/admin/AdminShell";
@@ -80,7 +80,7 @@ export default async function AdminUsersPage() {
       )}
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Users"
           value={o.activeUsers.toLocaleString("en-IN")}
@@ -98,6 +98,12 @@ export default async function AdminUsersPage() {
           value={o.roleBreakdown.length.toLocaleString("en-IN")}
           sub={o.roleBreakdown.map((r) => `${r.count} ${r.role}`).join(" · ") || "No users yet"}
           icon={PieChart}
+        />
+        <StatCard
+          label="Founding 100"
+          value={`${o.founding100Used} / ${o.founding100Seats}`}
+          sub={`${Math.max(0, o.founding100Seats - o.founding100Used)} spots left`}
+          icon={Trophy}
         />
       </div>
 
