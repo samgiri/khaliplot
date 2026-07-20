@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import PlotCard from "@/components/PlotCard";
 import FilterBar, { EMPTY_FILTERS, type FilterValues } from "@/components/FilterBar";
@@ -73,11 +73,21 @@ export default function BrowseClient({
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // Guards against rapid repeat taps on the Apply/Filters button (common on
+  // touch devices, where a double-tap can fire two click events before the
+  // button's `disabled` state re-renders).
+  const lastApplyRef = useRef(0);
+  // Tags each fetch so a slower, earlier response can never overwrite a
+  // faster, later one — without this, out-of-order responses could make the
+  // first click's request appear to have been silently dropped.
+  const requestIdRef = useRef(0);
+
   function onChange(field: keyof FilterValues, value: string) {
     setDraft((prev) => ({ ...prev, [field]: value }));
   }
 
   async function fetchFirstPage(filters: FilterValues, sortValue: SortOption) {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     const qs = buildQuery(filters, 1, sortValue);
     if (typeof window !== "undefined") {
@@ -86,6 +96,7 @@ export default function BrowseClient({
     try {
       const res = await fetch(`/api/browse${qs ? `?${qs}` : ""}`);
       const data: BrowsePage = await res.json();
+      if (requestIdRef.current !== requestId) return; // superseded by a newer request
       setListings(data.listings);
       setTotal(data.total);
       setHasMore(data.hasMore);
@@ -93,11 +104,14 @@ export default function BrowseClient({
     } catch {
       // Keep the previous results on a network hiccup rather than blanking out.
     } finally {
-      setLoading(false);
+      if (requestIdRef.current === requestId) setLoading(false);
     }
   }
 
   function applyFilters() {
+    const now = Date.now();
+    if (now - lastApplyRef.current < 400) return; // debounce rapid repeat taps
+    lastApplyRef.current = now;
     setApplied(draft);
     fetchFirstPage(draft, sort);
   }

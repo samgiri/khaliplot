@@ -75,7 +75,7 @@ export default function Footer() {
                 khaliplot<span className="text-amber">.in</span>
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-paper/70">
+            <p className="mt-4 max-w-xs text-base text-paper/80">
               India&apos;s plot marketplace. Find, compare and buy vacant land directly from
               verified owners — no clutter, no apartments, just plots.
             </p>
@@ -100,25 +100,25 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="coord-label text-paper/50">Explore</h3>
-            <ul className="mt-4 space-y-3 text-sm">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-paper/70">Explore</h3>
+            <ul className="mt-4 space-y-3 text-base">
               <li>
-                <Link href="/search?city=Lonavla" className="text-paper/80 hover:text-green-bright">
+                <Link href="/search?city=Lonavla" className="text-paper/90 hover:text-green-bright">
                   Plots in Lonavla
                 </Link>
               </li>
               <li>
-                <Link href="/search?city=Pune" className="text-paper/80 hover:text-green-bright">
+                <Link href="/search?city=Pune" className="text-paper/90 hover:text-green-bright">
                   Plots in Pune
                 </Link>
               </li>
               <li>
-                <Link href="/search?city=Nashik" className="text-paper/80 hover:text-green-bright">
+                <Link href="/search?city=Nashik" className="text-paper/90 hover:text-green-bright">
                   Plots in Nashik
                 </Link>
               </li>
               <li>
-                <Link href="/search" className="text-paper/80 hover:text-green-bright">
+                <Link href="/search" className="text-paper/90 hover:text-green-bright">
                   All listings
                 </Link>
               </li>
@@ -126,20 +126,20 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="coord-label text-paper/50">For sellers</h3>
-            <ul className="mt-4 space-y-3 text-sm">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-paper/70">For sellers</h3>
+            <ul className="mt-4 space-y-3 text-base">
               <li>
-                <Link href="/post-plot" className="text-paper/80 hover:text-green-bright">
+                <Link href="/post-plot" className="text-paper/90 hover:text-green-bright">
                   Post a plot — free
                 </Link>
               </li>
               <li>
-                <Link href="/my-listings" className="text-paper/80 hover:text-green-bright">
+                <Link href="/my-listings" className="text-paper/90 hover:text-green-bright">
                   My listings
                 </Link>
               </li>
               <li>
-                <Link href="/why-khaliplot" className="text-paper/80 hover:text-green-bright">
+                <Link href="/why-khaliplot" className="text-paper/90 hover:text-green-bright">
                   Why KhaliPlot
                 </Link>
               </li>
@@ -147,40 +147,40 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="coord-label text-paper/50">Company</h3>
-            <ul className="mt-4 space-y-3 text-sm">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-paper/70">Company</h3>
+            <ul className="mt-4 space-y-3 text-base">
               <li>
-                <Link href="/about" className="text-paper/80 hover:text-green-bright">
+                <Link href="/about" className="text-paper/90 hover:text-green-bright">
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/news" className="text-paper/80 hover:text-green-bright">
+                <Link href="/news" className="text-paper/90 hover:text-green-bright">
                   News
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-paper/80 hover:text-green-bright">
+                <Link href="/pricing" className="text-paper/90 hover:text-green-bright">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-paper/80 hover:text-green-bright">
+                <Link href="/faq" className="text-paper/90 hover:text-green-bright">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-paper/80 hover:text-green-bright">
+                <Link href="/contact" className="text-paper/90 hover:text-green-bright">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-paper/80 hover:text-green-bright">
+                <Link href="/terms" className="text-paper/90 hover:text-green-bright">
                   Terms
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-paper/80 hover:text-green-bright">
+                <Link href="/privacy" className="text-paper/90 hover:text-green-bright">
                   Privacy
                 </Link>
               </li>
@@ -188,8 +188,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="coord-label text-paper/50">Contact</h3>
-            <ul className="mt-4 space-y-3 text-sm text-paper/80">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-paper/70">Contact</h3>
+            <ul className="mt-4 space-y-3 text-base text-paper/90">
               <li className="flex items-center gap-2">
                 <Mail size={16} className="shrink-0 text-green-bright" />
                 <a href="mailto:hello@khaliplot.in" className="hover:text-green-bright">
@@ -210,7 +210,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-paper/10 pt-6 text-center text-xs text-paper/50 sm:flex sm:items-center sm:justify-between sm:text-left">
+        <div className="mt-10 border-t border-paper/10 pt-6 text-center text-sm text-paper/70 sm:flex sm:items-center sm:justify-between sm:text-left">
           <p>© {new Date().getFullYear()} KhaliPlot.in — All rights reserved.</p>
           <p className="mt-2 sm:mt-0">Property only for plots. Made in India.</p>
         </div>
