@@ -46,6 +46,8 @@ export async function GET(request: NextRequest) {
     activeUsers: overview.activeUsers,
     signupTrend: overview.signupTrend.map((p) => ({ date: p.date, count: p.value })),
     roleBreakdown: Object.fromEntries(overview.roleBreakdown.map((r) => [r.role, r.count])),
+    founding100Used: overview.founding100Used,
+    founding100Seats: overview.founding100Seats,
   };
 
   if (!dbConfigured()) {

@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { listings as seedListings } from "@/lib/data";
+import { FOUNDING_100_SEATS } from "@/lib/founding-100";
 
 // Estimated value of a single paid contact reveal (₹499 Reveal Pack ÷ 10, or a
 // paid-tier reveal). Used only for the revenue estimate on the dashboard.
@@ -82,6 +83,8 @@ export interface UsersOverview {
   activeUsers: number; // total registered users (the schema has no last-active field)
   signupTrend: DayPoint[]; // new profiles bucketed over the last 30 days
   roleBreakdown: RoleCount[]; // count per profiles.role, largest first
+  founding100Used: number; // profiles with founding_100_badge = true
+  founding100Seats: number; // total Founding 100 seats (see /pricing)
 }
 
 function countByRole(rows: { role: string | null }[]): RoleCount[] {
@@ -213,6 +216,8 @@ function seedUsersOverview(): UsersOverview {
     activeUsers: uniqueSellers,
     signupTrend: lastNDays(30), // no signup dates in seed data — empty 30-day frame
     roleBreakdown: [{ role: "seller", count: uniqueSellers }],
+    founding100Used: 0,
+    founding100Seats: FOUNDING_100_SEATS,
   };
 }
 
@@ -228,15 +233,23 @@ export async function getUsersOverview(): Promise<UsersOverview> {
   }
 
   try {
-    const { data, error } = await supabaseAdmin.from("profiles").select("role, created_at");
+    const { data, error } = await supabaseAdmin
+      .from("profiles")
+      .select("role, created_at, founding_100_badge");
     if (error) return seedUsersOverview();
 
-    const rows = (data ?? []) as { role: string | null; created_at: string }[];
+    const rows = (data ?? []) as {
+      role: string | null;
+      created_at: string;
+      founding_100_badge: boolean | null;
+    }[];
     return {
       live: true,
       activeUsers: rows.length,
       signupTrend: bucketByDay(rows.map((r) => r.created_at)),
       roleBreakdown: countByRole(rows),
+      founding100Used: rows.filter((r) => r.founding_100_badge).length,
+      founding100Seats: FOUNDING_100_SEATS,
     };
   } catch {
     return seedUsersOverview();

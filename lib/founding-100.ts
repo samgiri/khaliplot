@@ -1,6 +1,6 @@
 import { isSupabaseAdminConfigured, supabaseAdmin } from "@/lib/supabase-admin";
 
-const FOUNDING_100_SEATS = 100;
+export const FOUNDING_100_SEATS = 100;
 
 /**
  * Spots left in the Founding 100 (first 100 members get 50% off everything).
