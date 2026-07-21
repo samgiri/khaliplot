@@ -9,6 +9,7 @@ import {
   FileText,
   LifeBuoy,
   Megaphone,
+  PackageCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ export const ADMIN_NAV: NavItem[] = [
   { key: "overview", label: "Overview", href: "/admin", icon: LayoutDashboard, live: true },
   { key: "users", label: "Users", href: "/admin/users", icon: Users, live: true },
   { key: "listings", label: "Listings", href: "/admin/listings", icon: Building2, live: true },
+  { key: "packages", label: "Packages", href: "/admin/packages", icon: PackageCheck, live: true },
   { key: "transactions", label: "Transactions", href: "/admin/transactions", icon: Wallet, live: true },
   { key: "disputes", label: "Disputes & Fraud", href: "/admin/disputes", icon: AlertTriangle, live: false },
   { key: "analytics", label: "Analytics", href: "/admin/analytics", icon: BarChart3, live: true },

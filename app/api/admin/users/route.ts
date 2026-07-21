@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, dbConfigured } from "@/lib/admin-api";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getUsersOverview } from "@/lib/admin-stats";
+import { isPartnerType } from "@/lib/partner-types";
 
 // GET  /api/admin/users               — dashboard aggregates + list/search/filter
 // PATCH /api/admin/users              — moderate a user (role / subscription_tier)
@@ -13,7 +14,7 @@ import { getUsersOverview } from "@/lib/admin-stats";
 // list used by the moderation table.
 
 const USER_COLUMNS =
-  "id, name, email, phone, role, location, state, city, subscription_tier, sub_expires_at, created_at";
+  "id, name, email, phone, role, location, state, city, subscription_tier, sub_expires_at, partner_type, created_at";
 
 const ROLES = ["buyer", "seller", "broker", "builder"] as const;
 const TIERS = ["free", "featured", "boost"] as const;
@@ -29,6 +30,7 @@ interface UserRow {
   city: string | null;
   subscription_tier: string;
   sub_expires_at: string | null;
+  partner_type: string | null;
   created_at: string;
 }
 
@@ -96,7 +98,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  const updates: { role?: string; subscription_tier?: string } = {};
+  const updates: { role?: string; subscription_tier?: string; partner_type?: string | null } = {};
   if (body.role !== undefined) {
     if (!ROLES.includes(body.role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
@@ -108,6 +110,12 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Invalid subscription tier" }, { status: 400 });
     }
     updates.subscription_tier = body.subscription_tier;
+  }
+  if (body.partner_type !== undefined) {
+    if (body.partner_type !== null && !isPartnerType(body.partner_type)) {
+      return NextResponse.json({ error: "Invalid partner type" }, { status: 400 });
+    }
+    updates.partner_type = body.partner_type;
   }
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
