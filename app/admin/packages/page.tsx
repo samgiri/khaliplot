@@ -1,21 +1,21 @@
 import { redirect } from "next/navigation";
 import { isAuthenticated } from "@/lib/admin-auth";
 import AdminShell from "@/components/admin/AdminShell";
-import UsersClient from "./UsersClient";
+import PackagesClient from "./PackagesClient";
 
 export const metadata = {
-  title: "Users · Admin | KhaliPlot.in",
+  title: "Packages · Admin | KhaliPlot.in",
   robots: { index: false, follow: false },
 };
 
-export default async function AdminUsersPage() {
+export default async function AdminPackagesPage() {
   if (!(await isAuthenticated())) {
     redirect("/admin/login");
   }
 
   return (
-    <AdminShell active="users">
-      <UsersClient />
+    <AdminShell active="packages">
+      <PackagesClient />
     </AdminShell>
   );
 }
