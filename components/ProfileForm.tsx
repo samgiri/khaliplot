@@ -9,6 +9,7 @@ import {
   LANGUAGE_OPTIONS,
   CONTACT_METHOD_OPTIONS,
   phoneLocalDigits,
+  getCitiesForState,
   type Role,
   type Language,
   type ContactMethod,
@@ -178,7 +179,10 @@ export default function ProfileForm({
             id="state"
             required
             value={state}
-            onChange={(e) => setState(e.target.value)}
+            onChange={(e) => {
+              setState(e.target.value);
+              setCity(""); // old city rarely applies to the newly picked area
+            }}
             className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green-bright"
           >
             <option value="">Select area</option>
@@ -196,12 +200,18 @@ export default function ProfileForm({
           <input
             id="city"
             required
+            list="city-suggestions"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             maxLength={100}
-            placeholder="e.g. Pune, Lonavla, Nashik"
+            placeholder="Start typing your city…"
             className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
           />
+          <datalist id="city-suggestions">
+            {getCitiesForState(state).map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
         </div>
       </div>
 

@@ -33,6 +33,51 @@ export const INDIAN_STATES = [
   "West Bengal",
 ] as const;
 
+// Curated major cities per state/UT — suggestions only (the City field stays
+// free text), so this doesn't need to be exhaustive. Keys match INDIAN_STATES
+// exactly. Where a state already appears in lib/locations.ts STATE_REGIONS
+// (a different key vocabulary, used for the post-plot listing form), the
+// entries here stay consistent with it.
+export const STATE_CITIES: Record<string, string[]> = {
+  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati"],
+  "Arunachal Pradesh": ["Itanagar", "Naharlagun"],
+  Assam: ["Guwahati", "Dibrugarh", "Silchar"],
+  Bihar: ["Patna", "Gaya", "Muzaffarpur", "Bhagalpur"],
+  Chhattisgarh: ["Raipur", "Bhilai", "Bilaspur"],
+  "Delhi NCR": ["Delhi", "Gurgaon", "Noida", "Faridabad", "Ghaziabad"],
+  Goa: ["Panaji", "Margao", "Goa"],
+  Gujarat: ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Dholera"],
+  Haryana: ["Gurgaon", "Faridabad", "Panipat", "Karnal"],
+  "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala"],
+  "Jammu and Kashmir": ["Srinagar", "Jammu"],
+  Jharkhand: ["Ranchi", "Jamshedpur", "Dhanbad"],
+  Karnataka: ["Bengaluru", "Mysuru", "Mangaluru", "Hubballi"],
+  Kerala: ["Kochi", "Thiruvananthapuram", "Kozhikode"],
+  Ladakh: ["Leh", "Kargil"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur"],
+  Maharashtra: ["Mumbai", "Navi Mumbai", "Pune", "Nagpur", "Nashik", "Lonavla"],
+  Manipur: ["Imphal"],
+  Meghalaya: ["Shillong"],
+  Mizoram: ["Aizawl"],
+  Nagaland: ["Kohima", "Dimapur"],
+  Odisha: ["Bhubaneswar", "Cuttack", "Puri"],
+  Puducherry: ["Puducherry"],
+  Punjab: ["Ludhiana", "Amritsar", "Chandigarh", "Jalandhar"],
+  Rajasthan: ["Jaipur", "Udaipur", "Jodhpur", "Neemrana"],
+  Sikkim: ["Gangtok"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+  Telangana: ["Hyderabad", "Warangal"],
+  Tripura: ["Agartala"],
+  "Uttar Pradesh": ["Lucknow", "Noida", "Kanpur", "Agra", "Varanasi"],
+  Uttarakhand: ["Dehradun", "Haridwar", "Nainital"],
+  "West Bengal": ["Kolkata", "Howrah", "Siliguri"],
+};
+
+export function getCitiesForState(state: string | null | undefined): string[] {
+  if (!state) return [];
+  return STATE_CITIES[state] ?? [];
+}
+
 export const ROLE_OPTIONS = [
   { value: "buyer", label: "Buyer", description: "Looking to buy a plot" },
   { value: "seller", label: "Seller", description: "I own a plot to sell" },
