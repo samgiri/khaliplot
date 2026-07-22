@@ -41,9 +41,8 @@ export const ROLE_OPTIONS = [
 ] as const;
 
 export const LANGUAGE_OPTIONS = [
-  { value: "en", label: "English" },
-  { value: "hi", label: "Hindi" },
-  { value: "mr", label: "Marathi" },
+  { value: "english", label: "English" },
+  { value: "hindi", label: "Hindi" },
 ] as const;
 
 export const CONTACT_METHOD_OPTIONS = [
