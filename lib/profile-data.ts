@@ -33,26 +33,6 @@ export const INDIAN_STATES = [
   "West Bengal",
 ] as const;
 
-export const PRIME_CITIES = [
-  "Mumbai",
-  "Navi Mumbai",
-  "Pune",
-  "Delhi NCR",
-  "Gurgaon",
-  "Noida",
-  "Neemrana",
-  "Jaipur",
-  "Lonavla",
-  "Nashik",
-  "Dholera",
-  "Bengaluru",
-  "Hyderabad",
-  "Ahmedabad",
-  "Goa",
-] as const;
-
-export const OTHER_CITY = "Other";
-
 export const ROLE_OPTIONS = [
   { value: "buyer", label: "Buyer", description: "Looking to buy a plot" },
   { value: "seller", label: "Seller", description: "I own a plot to sell" },
@@ -61,8 +41,8 @@ export const ROLE_OPTIONS = [
 ] as const;
 
 export const LANGUAGE_OPTIONS = [
-  { value: "en", label: "English" },
-  { value: "hi", label: "Hindi" },
+  { value: "english", label: "English" },
+  { value: "hindi", label: "Hindi" },
 ] as const;
 
 export const CONTACT_METHOD_OPTIONS = [

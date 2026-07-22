@@ -5,8 +5,6 @@ import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import {
   INDIAN_STATES,
-  PRIME_CITIES,
-  OTHER_CITY,
   ROLE_OPTIONS,
   LANGUAGE_OPTIONS,
   CONTACT_METHOD_OPTIONS,
@@ -46,16 +44,12 @@ export default function ProfileForm({
   redirectTo,
 }: ProfileFormProps) {
   const router = useRouter();
-  const cityIsPrime = (PRIME_CITIES as readonly string[]).includes(initialCity);
 
   const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState(phoneLocalDigits(initialPhone));
   const [role, setRole] = useState<Role | "">(initialRole ?? "");
   const [state, setState] = useState(initialState);
-  const [citySelect, setCitySelect] = useState(
-    initialCity && !cityIsPrime ? OTHER_CITY : initialCity
-  );
-  const [cityOther, setCityOther] = useState(initialCity && !cityIsPrime ? initialCity : "");
+  const [city, setCity] = useState(initialCity);
   const [preferredLanguage, setPreferredLanguage] = useState<Language | "">(
     initialPreferredLanguage ?? ""
   );
@@ -64,8 +58,6 @@ export default function ProfileForm({
   );
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
-
-  const city = citySelect === OTHER_CITY ? cityOther.trim() : citySelect;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -180,7 +172,7 @@ export default function ProfileForm({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="state" className="text-sm font-semibold text-navy">
-            State
+            Area
           </label>
           <select
             id="state"
@@ -189,7 +181,7 @@ export default function ProfileForm({
             onChange={(e) => setState(e.target.value)}
             className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green-bright"
           >
-            <option value="">Select state</option>
+            <option value="">Select area</option>
             {INDIAN_STATES.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -199,33 +191,17 @@ export default function ProfileForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="city" className="text-sm font-semibold text-navy">
-            City / Area
+            City
           </label>
-          <select
+          <input
             id="city"
             required
-            value={citySelect}
-            onChange={(e) => setCitySelect(e.target.value)}
-            className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-green-bright"
-          >
-            <option value="">Select city</option>
-            {PRIME_CITIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-            <option value={OTHER_CITY}>Other</option>
-          </select>
-          {citySelect === OTHER_CITY && (
-            <input
-              required
-              value={cityOther}
-              onChange={(e) => setCityOther(e.target.value)}
-              maxLength={100}
-              placeholder="Enter your city / area"
-              className="mt-2 w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
-            />
-          )}
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            maxLength={100}
+            placeholder="e.g. Pune, Lonavla, Nashik"
+            className="w-full rounded-md border border-line bg-white px-3 py-2.5 text-sm focus:border-green-bright"
+          />
         </div>
       </div>
 

@@ -13,7 +13,12 @@ export async function GET(request: NextRequest) {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    return NextResponse.redirect(`${origin}/login`);
+    // Most commonly: the link was opened in a different browser/device than
+    // the one that requested it, so the PKCE code_verifier cookie set at
+    // send-time isn't present here to match the code. Send them back with a
+    // flag so the login page explains what happened instead of silently
+    // dumping them on a blank sign-in form.
+    return NextResponse.redirect(`${origin}/login?error=expired`);
   }
 
   const {
@@ -21,7 +26,7 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.redirect(`${origin}/login`);
+    return NextResponse.redirect(`${origin}/login?error=expired`);
   }
 
   const { data: profile } = await supabase

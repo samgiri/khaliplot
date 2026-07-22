@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import LoginForm from "./LoginForm";
@@ -29,7 +30,9 @@ export default async function LoginPage() {
           We&apos;ll email you a link — no password needed.
         </p>
         {configured ? (
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
         ) : (
           <p className="mt-6 rounded-lg border border-line bg-paper-dim p-4 text-sm text-muted">
             Sign-in isn&apos;t configured on this environment yet.

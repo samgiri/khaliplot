@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, CheckCircle2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Mail, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 
+const LAST_EMAIL_KEY = "kp_login_email";
+
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
+  const linkExpired = useSearchParams().get("error") === "expired";
+
+  // If we were bounced back after a failed magic-link exchange (most often:
+  // opened on a different browser/device than the one that requested it),
+  // prefill whichever email last requested a link on this browser.
+  const [email, setEmail] = useState(() =>
+    linkExpired && typeof window !== "undefined"
+      ? window.localStorage.getItem(LAST_EMAIL_KEY) ?? ""
+      : ""
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -30,6 +42,7 @@ export default function LoginForm() {
         return;
       }
 
+      window.localStorage.setItem(LAST_EMAIL_KEY, email);
       setSent(true);
     } catch {
       setError("Something went wrong. Try again.");
@@ -51,6 +64,13 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      {linkExpired && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber/40 bg-amber/10 p-3 text-sm text-amber-dark">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+          <span>That link expired or was opened elsewhere — request a new one below.</span>
+        </div>
+      )}
+
       <div>
         <label htmlFor="email" className="text-sm font-semibold text-navy">
           Email
@@ -77,7 +97,7 @@ export default function LoginForm() {
         disabled={loading}
         className="w-full rounded-md bg-green px-4 py-2.5 font-semibold text-paper transition-colors hover:bg-navy disabled:opacity-60"
       >
-        {loading ? "Sending…" : "Send magic link"}
+        {loading ? "Sending…" : linkExpired ? "Send new link" : "Send magic link"}
       </button>
     </form>
   );
