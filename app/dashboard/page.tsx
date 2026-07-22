@@ -5,10 +5,9 @@ import {
   Plus,
   UserCircle,
   List,
-  Eye,
   Heart,
-  KeyRound,
   MessageSquare,
+  KeyRound,
   History,
   ArrowRight,
 } from "lucide-react";
@@ -17,12 +16,13 @@ import { isProfileComplete, firstName, ROLE_OPTIONS } from "@/lib/profile-data";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import {
   getSavedPlots,
-  getViewedPlotsCount,
   getUserInquiries,
   getUserReveals,
   getMonthlyRevealCount,
   getMonthlyRevealQuota,
+  getCurrentPackage,
 } from "@/lib/dashboard-service";
+import { packageLabel } from "@/lib/package-types";
 import PlotCard from "@/components/PlotCard";
 
 export const metadata = {
@@ -47,13 +47,22 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
+/** "23 days left" / "Expires today" / "Expired" / "No expiry" for the package status card. */
+function daysLeftText(expiresAt: string | null): string {
+  if (!expiresAt) return "No expiry";
+  const diffMs = new Date(expiresAt).getTime() - Date.now();
+  if (diffMs <= 0) return "Expired";
+  const days = Math.ceil(diffMs / 86_400_000);
+  return days === 0 ? "Expires today" : `${days} day${days === 1 ? "" : "s"} left`;
+}
+
 function StatCard({
   icon: Icon,
   label,
   value,
   sublabel,
 }: {
-  icon: typeof Eye;
+  icon: typeof MessageSquare;
   label: string;
   value: string | number;
   sublabel?: string;
@@ -89,16 +98,21 @@ export default async function DashboardPage() {
     .maybeSingle();
   const subscriptionTier = tierRow?.subscription_tier ?? "free";
 
-  const [savedPlots, viewedCount, inquiries, reveals, revealsThisMonth] = await Promise.all([
+  const [savedPlots, inquiries, reveals, revealsThisMonth, currentPackage] = await Promise.all([
     getSavedPlots(supabase, session.userId),
-    getViewedPlotsCount(supabase, session.userId),
     getUserInquiries(supabase, session.userId),
     getUserReveals(supabase, session.userId),
     getMonthlyRevealCount(supabase, session.userId),
+    getCurrentPackage(supabase, session.userId),
   ]);
 
   const revealQuota = getMonthlyRevealQuota(subscriptionTier); // null = unlimited
-  const revealPct = revealQuota ? Math.min(100, (revealsThisMonth / revealQuota) * 100) : 100;
+  const revealsRemaining = revealQuota === null ? null : Math.max(0, revealQuota - revealsThisMonth);
+  const remainingPct = revealQuota === null ? 100 : Math.min(100, Math.max(0, (revealsRemaining! / revealQuota) * 100));
+
+  const packageTier = currentPackage?.tier ?? subscriptionTier;
+  const packageDisplayName = packageLabel(currentPackage?.packageKey ?? null, packageTier);
+  const packageExpiryText = daysLeftText(currentPackage?.expiresAt ?? null);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-14 sm:px-8">
@@ -110,26 +124,46 @@ export default async function DashboardPage() {
         {roleLabel}
       </span>
 
-      {/* Overview */}
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard icon={Eye} label="Plots viewed" value={viewedCount} />
-        <StatCard icon={Heart} label="Saved plots" value={savedPlots.length} />
-        <div className="rounded-lg border border-line bg-white p-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-pale text-green">
-            <KeyRound size={20} />
+      {/* Package & quota status */}
+      <div className="mt-8 rounded-xl border-2 border-navy bg-white p-6 shadow-[6px_6px_0_0_var(--color-amber)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="coord-label text-green">Your package</p>
+            <p className="mt-1 font-display text-2xl font-bold text-navy">{packageDisplayName}</p>
+            <p className="mt-1 text-sm text-muted">{packageExpiryText}</p>
           </div>
-          <p className="mt-3 font-display text-2xl font-bold text-navy">
-            {revealQuota === null ? "Unlimited" : `${revealsThisMonth}/${revealQuota}`}
-          </p>
-          <p className="text-sm text-muted">
-            Reveals used{revealQuota === null ? "" : " this month"}
-          </p>
+          <Link
+            href="/pricing"
+            className="rounded-md bg-amber px-5 py-2.5 font-semibold text-navy transition-colors hover:bg-amber-dark"
+          >
+            Upgrade package
+          </Link>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold text-navy">Reveals remaining</span>
+            <span className="text-muted">
+              {revealQuota === null ? "Unlimited" : `${revealsRemaining}/${revealQuota}`}
+            </span>
+          </div>
           {revealQuota !== null && (
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-paper-dim">
-              <div className="h-full rounded-full bg-green" style={{ width: `${revealPct}%` }} />
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-paper-dim">
+              <div className="h-full rounded-full bg-green" style={{ width: `${remainingPct}%` }} />
             </div>
           )}
         </div>
+      </div>
+
+      {/* Quick stats */}
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCard icon={Heart} label="Saved plots" value={savedPlots.length} />
+        <StatCard icon={MessageSquare} label="Inquiries sent" value={inquiries.length} />
+        <StatCard
+          icon={KeyRound}
+          label="Reveals left"
+          value={revealQuota === null ? "Unlimited" : `${revealsRemaining}/${revealQuota}`}
+        />
       </div>
 
       {/* Quick links */}
@@ -180,23 +214,35 @@ export default async function DashboardPage() {
         {inquiries.length > 0 ? (
           <div className="mt-4 space-y-3">
             {inquiries.map((inquiry) => (
-              <Link
-                key={inquiry.id}
-                href={`/listing/${inquiry.plotId}`}
-                className="plot-border plot-border-hover flex items-center justify-between gap-4 rounded-lg bg-white p-4 transition-shadow hover:shadow-md"
-              >
-                <div>
-                  <p className="font-display font-semibold text-navy">{inquiry.plotTitle}</p>
-                  <p className="mt-0.5 text-sm text-muted">
-                    Via {inquiry.channel} · {formatDate(inquiry.createdAt)}
-                  </p>
+              <div key={inquiry.id} className="plot-border rounded-lg bg-white p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <Link
+                      href={`/listing/${inquiry.plotId}`}
+                      className="font-display font-semibold text-navy hover:text-green"
+                    >
+                      {inquiry.plotTitle}
+                    </Link>
+                    <p className="mt-0.5 text-sm text-muted">
+                      To {inquiry.sellerName || "Seller"} · Via {inquiry.channel} ·{" "}
+                      {formatDate(inquiry.createdAt)}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${INQUIRY_STATUS_STYLES[inquiry.status] ?? "bg-line text-muted"}`}
+                  >
+                    {inquiry.status}
+                  </span>
                 </div>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${INQUIRY_STATUS_STYLES[inquiry.status] ?? "bg-line text-muted"}`}
-                >
-                  {inquiry.status}
-                </span>
-              </Link>
+                {inquiry.message.trim() && (
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-sm font-semibold text-green hover:text-navy">
+                      View message
+                    </summary>
+                    <p className="mt-1.5 whitespace-pre-wrap text-sm text-ink/80">{inquiry.message}</p>
+                  </details>
+                )}
+              </div>
             ))}
           </div>
         ) : (

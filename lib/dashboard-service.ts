@@ -52,14 +52,6 @@ export async function getSavedPlots(client: SupabaseClient, userId: string): Pro
     .filter((entry): entry is SavedPlotEntry => Boolean(entry.listing));
 }
 
-export async function getViewedPlotsCount(client: SupabaseClient, userId: string): Promise<number> {
-  const { count } = await client
-    .from("listing_views")
-    .select("id", { count: "exact", head: true })
-    .eq("viewer_id", userId);
-  return count ?? 0;
-}
-
 /** Fire-and-forget: records that a signed-in user viewed a plot. Never throws. */
 export async function recordListingView(
   client: SupabaseClient,
@@ -79,6 +71,7 @@ export interface InquiryEntry {
   id: string;
   plotId: string;
   plotTitle: string;
+  sellerName: string | null;
   channel: string;
   status: string;
   message: string;
@@ -88,7 +81,7 @@ export interface InquiryEntry {
 export async function getUserInquiries(client: SupabaseClient, userId: string): Promise<InquiryEntry[]> {
   const { data } = await client
     .from("inquiries")
-    .select("id, plot_id, channel, status, message, created_at")
+    .select("id, plot_id, seller_id, channel, status, message, created_at")
     .eq("buyer_id", userId)
     .order("created_at", { ascending: false });
 
@@ -98,10 +91,17 @@ export async function getUserInquiries(client: SupabaseClient, userId: string): 
   const listings = await getListingsByIds([...new Set(rows.map((r) => r.plot_id as string))]);
   const titleById = new Map(listings.map((l) => [l.id, l.title]));
 
+  const sellerIds = [...new Set(rows.map((r) => r.seller_id as string))];
+  const { data: sellers } = await client.from("profiles").select("id, name").in("id", sellerIds);
+  const sellerNameById = new Map(
+    (sellers ?? []).map((s) => [s.id as string, s.name as string | null])
+  );
+
   return rows.map((r) => ({
     id: r.id as string,
     plotId: r.plot_id as string,
     plotTitle: titleById.get(r.plot_id as string) ?? "Plot",
+    sellerName: sellerNameById.get(r.seller_id as string) ?? null,
     channel: r.channel as string,
     status: r.status as string,
     message: r.message as string,
@@ -158,4 +158,40 @@ export async function getMonthlyRevealCount(client: SupabaseClient, userId: stri
 export function getMonthlyRevealQuota(subscriptionTier: string | null | undefined): number | null {
   if (subscriptionTier && subscriptionTier !== "free") return null; // null = unlimited
   return 1;
+}
+
+export interface CurrentPackage {
+  tier: string;
+  packageKey: string | null;
+  expiresAt: string | null;
+  status: string;
+}
+
+/**
+ * The buyer's current package for the dashboard's status card — the latest
+ * non-cancelled subscriptions row, same "current package" definition used by
+ * the admin Extend/Cancel actions (app/api/admin/packages/route.ts). Reads
+ * package_key (not just tier) so e.g. "Plus 100D" vs "Plus Yearly" display
+ * correctly. RLS already scopes this to the caller's own rows.
+ */
+export async function getCurrentPackage(
+  client: SupabaseClient,
+  userId: string
+): Promise<CurrentPackage | null> {
+  const { data } = await client
+    .from("subscriptions")
+    .select("tier, package_key, expires_at, status")
+    .eq("user_id", userId)
+    .neq("status", "cancelled")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return null;
+  return {
+    tier: data.tier as string,
+    packageKey: data.package_key as string | null,
+    expiresAt: data.expires_at as string | null,
+    status: data.status as string,
+  };
 }
