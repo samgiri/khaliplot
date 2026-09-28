@@ -84,7 +84,7 @@ export default function Footer() {
                 { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/khaliplot.in/" },
                 { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@khaliplotofficial" },
                 { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/profile.php?id=61590907800386" },
-                { icon: LinkedinIcon, label: "LinkedIn", href: "#" },
+                { icon: LinkedinIcon, label: "LinkedIn", href: "https://www.linkedin.com/company/146654131/" },
               ].map(({ icon: Icon, label, href }) => (
                 <a
                   key={label}
