@@ -82,8 +82,8 @@ export default function Footer() {
             <div className="mt-5 flex gap-3">
               {[
                 { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/khaliplot.in/" },
-                { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@khaliplot" },
-                { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/khaliplot.in/" },
+                { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@khaliplotofficial" },
+                { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/profile.php?id=61590907800386" },
                 { icon: LinkedinIcon, label: "LinkedIn", href: "#" },
               ].map(({ icon: Icon, label, href }) => (
                 <a
