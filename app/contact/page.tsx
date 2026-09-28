@@ -10,7 +10,7 @@ export const metadata = {
 const directContacts = [
   {
     label: "WhatsApp",
-    href: "https://wa.me/919625763256",
+    href: "https://wa.me/919211552233",
     icon: MessageCircle,
     className: "bg-whatsapp hover:bg-whatsapp-hover",
     external: true,
@@ -24,7 +24,7 @@ const directContacts = [
   },
   {
     label: "Phone",
-    href: "tel:+919625763256",
+    href: "tel:+919211552233",
     icon: Phone,
     className: "bg-amber hover:bg-amber-dark",
     external: false,
@@ -68,13 +68,13 @@ function YoutubeIcon({ size = 18 }: { size?: number }) {
 const socialLinks = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/khaliplot",
+    href: "https://www.facebook.com/khaliplot.in/",
     icon: FacebookIcon,
     className: "bg-facebook hover:bg-facebook-hover",
   },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/khaliplot",
+    href: "https://www.instagram.com/khaliplot.in/",
     icon: InstagramIcon,
     className: "bg-instagram-gradient",
   },
@@ -176,14 +176,14 @@ export default function ContactPage() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="shrink-0 text-green" />
-                <a href="tel:+919625763256" className="text-ink/80 hover:text-green">
-                  +91 96257 63256
+                <a href="tel:+919211552233" className="text-ink/80 hover:text-green">
+                  +91 92115 52233
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <MessageCircle size={18} className="shrink-0 text-green" />
                 <a
-                  href="https://wa.me/919625763256"
+                  href="https://wa.me/919211552233"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-ink/80 hover:text-green"

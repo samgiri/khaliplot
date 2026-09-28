@@ -162,7 +162,7 @@ export default function ContactForm() {
           <p className="mt-2 text-muted">You can also reach us directly:</p>
           <div className="mt-2 flex flex-wrap gap-3">
             <a
-              href="https://wa.me/919625763256"
+              href="https://wa.me/919211552233"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 font-semibold text-green hover:text-navy"

@@ -81,9 +81,9 @@ export default function Footer() {
             </p>
             <div className="mt-5 flex gap-3">
               {[
-                { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/khaliplot" },
+                { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/khaliplot.in/" },
                 { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@khaliplot" },
-                { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/khaliplot" },
+                { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/khaliplot.in/" },
                 { icon: LinkedinIcon, label: "LinkedIn", href: "#" },
               ].map(({ icon: Icon, label, href }) => (
                 <a
@@ -198,8 +198,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={16} className="shrink-0 text-green-bright" />
-                <a href="tel:+919625763256" className="hover:text-green-bright">
-                  +91 96257 63256
+                <a href="tel:+919211552233" className="hover:text-green-bright">
+                  +91 92115 52233
                 </a>
               </li>
               <li className="flex items-center gap-2">

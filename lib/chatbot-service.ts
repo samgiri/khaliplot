@@ -2,7 +2,7 @@
 // checked in order; "sell"/"listing" runs before "buy"/"plot" so that
 // "I want to sell my plot" doesn't get caught by the plot-buying rule.
 
-export const WHATSAPP_URL = "https://wa.me/919625763256";
+export const WHATSAPP_URL = "https://wa.me/919211552233";
 
 export const CHATBOT_GREETING =
   "Hi! I'm the KhaliPlot Assistant 👋 Ask me about buying, selling, pricing or our packages.";

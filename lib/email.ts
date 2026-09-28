@@ -11,7 +11,7 @@ const RESEND_ENDPOINT = "https://api.resend.com/emails";
 // Verified sender. Override with CONTACT_FROM_EMAIL once your domain is
 // verified in Resend; the default matches the address used across the site.
 const DEFAULT_FROM = "KhaliPlot <hello@khaliplot.in>";
-const KHALIPLOT_WHATSAPP = "919625763256";
+const KHALIPLOT_WHATSAPP = "919211552233";
 
 function escapeHtml(value: string): string {
   return value
@@ -72,7 +72,7 @@ async function sendContactAutoReply(input: ContactEmailInput): Promise<void> {
       <h2 style="color:#001e3c; margin:0 0 12px;">Thanks for reaching out, ${name}!</h2>
       <p style="margin:0 0 12px;">We've received your message and the KhaliPlot team will reply within 24 hours.</p>
       <p style="margin:0 0 16px; color:#5b6b7c;">For a faster reply you can also WhatsApp us at
-        <a href="https://wa.me/${KHALIPLOT_WHATSAPP}" style="color:#6ea028; font-weight:600;">+91 96257 63256</a>.</p>
+        <a href="https://wa.me/${KHALIPLOT_WHATSAPP}" style="color:#6ea028; font-weight:600;">+91 92115 52233</a>.</p>
       <hr style="border:none; border-top:1px solid #e7e2d8; margin:20px 0;">
       <p style="margin:0 0 6px; color:#5b6b7c; font-size:13px;">Your message:</p>
       <blockquote style="margin:0; padding:0 0 0 12px; border-left:3px solid #f5a623; color:#5b6b7c; font-size:14px; white-space:pre-wrap;">${escapeHtml(input.message)}</blockquote>
