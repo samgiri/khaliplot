@@ -68,7 +68,7 @@ function YoutubeIcon({ size = 18 }: { size?: number }) {
 const socialLinks = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/khaliplot.in/",
+    href: "https://www.facebook.com/profile.php?id=61590907800386",
     icon: FacebookIcon,
     className: "bg-facebook hover:bg-facebook-hover",
   },
@@ -80,7 +80,7 @@ const socialLinks = [
   },
   {
     label: "YouTube",
-    href: "https://www.youtube.com/@khaliplot",
+    href: "https://www.youtube.com/@khaliplotofficial",
     icon: YoutubeIcon,
     className: "bg-youtube hover:bg-youtube-hover",
   },
