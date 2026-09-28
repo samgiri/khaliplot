@@ -184,8 +184,8 @@ export default function AboutPage() {
           <a href="mailto:hello@khaliplot.in" className="flex items-center gap-2 hover:text-green">
             <Mail size={18} className="text-green" /> hello@khaliplot.in
           </a>
-          <a href="tel:+919625763256" className="flex items-center gap-2 hover:text-green">
-            <Phone size={18} className="text-green" /> +91 96257 63256
+          <a href="tel:+919211552233" className="flex items-center gap-2 hover:text-green">
+            <Phone size={18} className="text-green" /> +91 92115 52233
           </a>
         </div>
         <div className="mt-6">

@@ -29,8 +29,8 @@ import CityLandmark from "@/components/CityLandmark";
 import TrustBadges from "@/components/TrustBadges";
 import UnitConverterButton from "@/components/UnitConverterModal";
 
-const KHALIPLOT_WHATSAPP = "919625763256";
-const KHALIPLOT_PHONE = "+919625763256";
+const KHALIPLOT_WHATSAPP = "919211552233";
+const KHALIPLOT_PHONE = "+919211552233";
 const KHALIPLOT_EMAIL = "hello@khaliplot.in";
 
 export const revalidate = 60;

@@ -481,7 +481,7 @@ export default async function Home() {
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="https://wa.me/919625763256"
+              href="https://wa.me/919211552233"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md bg-whatsapp px-6 py-3 font-semibold text-white transition-colors hover:bg-whatsapp-hover"
